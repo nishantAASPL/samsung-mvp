@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Backend — excluded from frontend repo
+backend/
+
+# Local dev scripts (bat/ps1 are local only)
+start-backend.bat
+start-backend.ps1
+start-frontend.bat
+start-frontend.ps1
+
+# Source prototype (not needed in deployed repo)
+dev.jsx
+
+# Misc
+.DS_Store
+*.local
