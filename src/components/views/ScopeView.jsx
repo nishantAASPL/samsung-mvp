@@ -83,11 +83,11 @@ export default function ScopeView({ model }) {
           </div>
         </div>
         <div className="bg-white p-5 rounded-lg border border-[#E5E7EB] shadow-sm space-y-4">
-          <div className="flex items-center gap-2"><Users size={18} className="text-[#1428A0]"/><h4 className="font-bold text-sm">5 Network Partners</h4></div>
+          <div className="flex items-center gap-2"><Users size={18} className="text-[#1428A0]"/><h4 className="font-bold text-sm">7 Regional Partners</h4></div>
           <div className="space-y-1">
             {partners.map(p => (
               <div key={p.id} className="flex justify-between items-center text-xs p-1.5">
-                <span className="font-semibold text-gray-700">{p.name.split('-')[1].trim()}</span>
+                <span className="font-semibold text-gray-700">{p.name}</span>
                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${p.tier === 'Platinum' ? 'bg-gray-800 text-white' : p.tier === 'Gold' ? 'bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>{p.tier}</span>
               </div>
             ))}

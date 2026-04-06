@@ -1,15 +1,37 @@
 import React from 'react';
 import { Table, ShieldAlert, CheckCircle2, Factory, Database } from 'lucide-react';
+import { networkStores } from '../../data/mockData';
 
 export default function PolicyTable({ model }) {
-  // Use model to change calculated min/max and status dynamically
-  const policyData = [
-    { loc: 'Store #045 (NYC)', stock: 8, legacyMin: 15, legacyMax: 30, aiMin: 5, aiMax: 12, aiAction: 'Healthy', legacyAction: 'Critical Low' },
-    { loc: 'Store #142 (CHI)', stock: 45, legacyMin: 10, legacyMax: 50, aiMin: 40, aiMax: 80, aiAction: 'Reorder Imminent', legacyAction: 'Healthy' },
-    { loc: 'Store #082 (BKN)', stock: 2, legacyMin: 5, legacyMax: 15, aiMin: 8, aiMax: 20, aiAction: 'Critical Low', legacyAction: 'Critical Low' },
-    { loc: 'Store #210 (SCH)', stock: 24, legacyMin: 20, legacyMax: 40, aiMin: 10, aiMax: 25, aiAction: 'Healthy', legacyAction: 'Healthy' },
-    { loc: 'Partner Hub (East)', stock: 410, legacyMin: 300, legacyMax: 500, aiMin: 150, aiMax: 300, aiAction: 'Excess/Dead Stock', legacyAction: 'Healthy' }
-  ];
+  const policyData = networkStores.map(store => {
+      const stock = store.stock;
+      const threshold = store.threshold;
+      
+      const legacyMin = threshold;
+      const legacyMax = threshold * 2;
+      const aiMin = Math.round(threshold * 0.8);
+      const aiMax = Math.round(threshold * 1.5);
+      
+      let legacyAction = 'Healthy';
+      if (store.asIsStock < legacyMin) legacyAction = 'Critical Low';
+      if (store.asIsStock > legacyMax) legacyAction = 'Excess/Dead Stock';
+      
+      let aiAction = 'Healthy';
+      if (stock < aiMin) aiAction = 'Critical Low';
+      else if (stock > aiMax * 1.2) aiAction = 'Excess/Dead Stock';
+      else if (stock > aiMax) aiAction = 'Reorder Imminent';
+
+      return {
+          loc: store.location,
+          stock: model === 'AS_IS' ? store.asIsStock : stock,
+          legacyMin,
+          legacyMax,
+          aiMin,
+          aiMax,
+          aiAction,
+          legacyAction
+      };
+  });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in duration-500 h-full flex flex-col">

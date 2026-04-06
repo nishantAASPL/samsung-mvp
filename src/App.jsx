@@ -66,7 +66,6 @@ export default function App() {
           <div className="mb-2">
             <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Live Operations</p>
             <button onClick={() => setView('VIEW_QUEUE')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_QUEUE' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Reservation Queue</button>
-            <button onClick={() => setView('VIEW_SIM')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_SIM' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Zap size={16} /> Live Intercept Sim</button>
             <button onClick={() => setView('VIEW_2')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_2' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Health Map</button>
             <button onClick={() => setView('NETWORK_MAP')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'NETWORK_MAP' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Live Topography</button>
             <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Network Intelligence</button>
@@ -87,7 +86,7 @@ export default function App() {
               {partners.map(p => (
                 <button key={p.id} onClick={() => setSelectedPartner(p.id)} className={`w-full flex flex-col items-start px-3 py-2 rounded transition-all border ${selectedPartner === p.id ? 'bg-[#EBF0FA] border-blue-200' : 'border-transparent hover:bg-gray-50'}`}>
                   <span className={`text-xs font-bold ${selectedPartner === p.id ? 'text-[#1428A0]' : 'text-gray-800'}`}>{p.id}</span>
-                  <span className="text-[9px] text-gray-500">{p.name.split('-')[1].trim()}</span>
+                  <span className="text-[9px] text-gray-500 font-medium truncate w-full text-left">{p.name}</span>
                 </button>
               ))}
             </div>
