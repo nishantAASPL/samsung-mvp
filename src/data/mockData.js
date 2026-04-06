@@ -16,11 +16,13 @@ export const oemMetrics = {
       { id: 3, type: 'danger', title: 'Chronic Shortage', msg: 'Store #092 repeatedly out of S24 Ports. Emergency PO required.' }
     ],
     partnerFtfr: [
-      { id: 'S-045', name: 'Store #045 - New York', ftfr: 54 },
-      { id: 'S-092', name: 'Store #092 - Los Angeles', ftfr: 48 },
-      { id: 'S-142', name: 'Store #142 - Chicago', ftfr: 41 },
-      { id: 'S-187', name: 'Store #187 - Naperville', ftfr: 59 },
-      { id: 'S-210', name: 'Store #210 - Dallas', ftfr: 58 }
+      { id: 'P-045', name: 'Northeast Hub (NY)', ftfr: 54 },
+      { id: 'P-092', name: 'West Coast Hub (LA)', ftfr: 48 },
+      { id: 'P-142', name: 'Central Hub (CHI)', ftfr: 41 },
+      { id: 'P-187', name: 'Suburban Hub (NAP)', ftfr: 59 },
+      { id: 'P-210', name: 'South Hub (DAL)', ftfr: 58 },
+      { id: 'P-301', name: 'Southeast Hub (MIA)', ftfr: 52 },
+      { id: 'P-404', name: 'Northwest Hub (SEA)', ftfr: 55 }
     ]
   },
   TO_BE: {
@@ -40,11 +42,13 @@ export const oemMetrics = {
       { id: 3, type: 'success', title: 'Wave Pre-Order', msg: 'Pre-ordered 42 A54 Batteries for Chicago to absorb incoming 2nd-cycle wave.' }
     ],
     partnerFtfr: [
-      { id: 'S-045', name: 'Store #045 - New York', ftfr: 82 },
-      { id: 'S-092', name: 'Store #092 - Los Angeles', ftfr: 76 },
-      { id: 'S-142', name: 'Store #142 - Chicago', ftfr: 88 },
-      { id: 'S-187', name: 'Store #187 - Naperville', ftfr: 71 },
-      { id: 'S-210', name: 'Store #210 - Dallas', ftfr: 75 }
+      { id: 'P-045', name: 'Northeast Hub (NY)', ftfr: 82 },
+      { id: 'P-092', name: 'West Coast Hub (LA)', ftfr: 76 },
+      { id: 'P-142', name: 'Central Hub (CHI)', ftfr: 88 },
+      { id: 'P-187', name: 'Suburban Hub (NAP)', ftfr: 71 },
+      { id: 'P-210', name: 'South Hub (DAL)', ftfr: 75 },
+      { id: 'P-301', name: 'Southeast Hub (MIA)', ftfr: 78 },
+      { id: 'P-404', name: 'Northwest Hub (SEA)', ftfr: 85 }
     ]
   }
 };
@@ -76,6 +80,135 @@ export const partners = [
   { id: 'P-404', name: 'Northwest Hub (SEA)', region: 'West', tier: 'Gold', backlog: 78, score: '90%' }
 ];
 
+export const partnerPerformance = {
+  'P-045': {
+    slaHistory: [
+      { month: 'Jan', asIs: 82, toBe: 91 },
+      { month: 'Feb', asIs: 78, toBe: 92 },
+      { month: 'Mar', asIs: 64, toBe: 94 },
+      { month: 'Apr', asIs: 71, toBe: 95 },
+      { month: 'May', asIs: 85, toBe: 98 },
+      { month: 'Jun', asIs: 88, toBe: 99 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 85 },
+      { category: 'Batteries', score: 92 },
+      { category: 'Ports', score: 78 },
+      { category: 'Panels', score: 65 },
+      { category: 'Motherboards', score: 90 }
+    ],
+    financials: { lostSales: 42000, savings: 128000, mtbfExposure: 142 }
+  },
+  'P-092': {
+    slaHistory: [
+      { month: 'Jan', asIs: 85, toBe: 94 },
+      { month: 'Feb', asIs: 82, toBe: 95 },
+      { month: 'Mar', asIs: 74, toBe: 96 },
+      { month: 'Apr', asIs: 79, toBe: 97 },
+      { month: 'May', asIs: 88, toBe: 98 },
+      { month: 'Jun', asIs: 91, toBe: 99 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 92 },
+      { category: 'Batteries', score: 95 },
+      { category: 'Ports', score: 88 },
+      { category: 'Panels', score: 82 },
+      { category: 'Motherboards', score: 95 }
+    ],
+    financials: { lostSales: 18000, savings: 245000, mtbfExposure: 88 }
+  },
+  'P-142': {
+    slaHistory: [
+      { month: 'Jan', asIs: 72, toBe: 88 },
+      { month: 'Feb', asIs: 68, toBe: 89 },
+      { month: 'Mar', asIs: 54, toBe: 92 },
+      { month: 'Apr', asIs: 61, toBe: 94 },
+      { month: 'May', asIs: 75, toBe: 96 },
+      { month: 'Jun', asIs: 78, toBe: 98 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 65 },
+      { category: 'Batteries', score: 72 },
+      { category: 'Ports', score: 68 },
+      { category: 'Panels', score: 75 },
+      { category: 'Motherboards', score: 82 }
+    ],
+    financials: { lostSales: 78000, savings: 312000, mtbfExposure: 264 }
+  },
+  'P-187': {
+    slaHistory: [
+      { month: 'Jan', asIs: 75, toBe: 82 },
+      { month: 'Feb', asIs: 72, toBe: 84 },
+      { month: 'Mar', asIs: 64, toBe: 86 },
+      { month: 'Apr', asIs: 69, toBe: 88 },
+      { month: 'May', asIs: 78, toBe: 92 },
+      { month: 'Jun', asIs: 81, toBe: 94 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 78 },
+      { category: 'Batteries', score: 82 },
+      { category: 'Ports', score: 85 },
+      { category: 'Panels', score: 88 },
+      { category: 'Motherboards', score: 90 }
+    ],
+    financials: { lostSales: 32000, savings: 94000, mtbfExposure: 56 }
+  },
+  'P-210': {
+    slaHistory: [
+      { month: 'Jan', asIs: 78, toBe: 89 },
+      { month: 'Feb', asIs: 75, toBe: 91 },
+      { month: 'Mar', asIs: 68, toBe: 92 },
+      { month: 'Apr', asIs: 72, toBe: 94 },
+      { month: 'May', asIs: 82, toBe: 96 },
+      { month: 'Jun', asIs: 85, toBe: 98 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 82 },
+      { category: 'Batteries', score: 88 },
+      { category: 'Ports', score: 92 },
+      { category: 'Panels', score: 95 },
+      { category: 'Motherboards', score: 98 }
+    ],
+    financials: { lostSales: 48000, savings: 156000, mtbfExposure: 112 }
+  },
+  'P-301': {
+    slaHistory: [
+      { month: 'Jan', asIs: 70, toBe: 85 },
+      { month: 'Feb', asIs: 68, toBe: 86 },
+      { month: 'Mar', asIs: 62, toBe: 88 },
+      { month: 'Apr', asIs: 65, toBe: 90 },
+      { month: 'May', asIs: 72, toBe: 92 },
+      { month: 'Jun', asIs: 75, toBe: 94 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 75 },
+      { category: 'Batteries', score: 78 },
+      { category: 'Ports', score: 82 },
+      { category: 'Panels', score: 85 },
+      { category: 'Motherboards', score: 88 }
+    ],
+    financials: { lostSales: 38000, savings: 85000, mtbfExposure: 74 }
+  },
+  'P-404': {
+    slaHistory: [
+      { month: 'Jan', asIs: 82, toBe: 90 },
+      { month: 'Feb', asIs: 80, toBe: 91 },
+      { month: 'Mar', asIs: 72, toBe: 94 },
+      { month: 'Apr', asIs: 78, toBe: 96 },
+      { month: 'May', asIs: 85, toBe: 98 },
+      { month: 'Jun', asIs: 88, toBe: 99 }
+    ],
+    readiness: [
+      { category: 'Displays', score: 88 },
+      { category: 'Batteries', score: 92 },
+      { category: 'Ports', score: 95 },
+      { category: 'Panels', score: 98 },
+      { category: 'Motherboards', score: 99 }
+    ],
+    financials: { lostSales: 45000, savings: 172000, mtbfExposure: 96 }
+  }
+};
+
 export const networkStores = [
   { id: 'NY-101', partnerId: 'P-045', location: 'Manhattan', stock: 0, asIsStock: 12, threshold: 10 },
   { id: 'NY-102', partnerId: 'P-045', location: 'Brooklyn', stock: 45, asIsStock: 45, threshold: 10 },
@@ -88,6 +221,7 @@ export const networkStores = [
   { id: 'CH-301', partnerId: 'P-142', location: 'Loop Store', stock: 0, asIsStock: 12, threshold: 25 },
   { id: 'CH-302', partnerId: 'P-142', location: 'Lincoln Park', stock: 65, asIsStock: 0, threshold: 25 },
   { id: 'CH-303', partnerId: 'P-142', location: 'Wicker Park', stock: 22, asIsStock: 40, threshold: 25 },
+
 
   { id: 'NA-401', partnerId: 'P-187', location: 'Naperville N', stock: 5, asIsStock: 5, threshold: 8 },
   { id: 'NA-402', partnerId: 'P-187', location: 'Aurora Store', stock: 48, asIsStock: 10, threshold: 8 },
@@ -726,43 +860,55 @@ export const scopeDetails = {
 
 export const inventoryData = {
   AS_IS: {
-    'S-045': [
+    'P-045': [
       { part: 'PT19 - Back Panel', model: 'Galaxy M34', mtbf: '48m', fleetAge: '12m', fleetSize: 850, stock: 180, cost: 25, threshold: '20', action: 'None', alert: 'Severe Dead Stock', alertType: 'warning', insight: 'Stock covers 1,300+ days of demand. Capital is trapped.' },
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '10m', fleetSize: 1100, stock: 15, cost: 35, threshold: '15', action: 'None', alert: 'Normal', alertType: 'success', insight: 'Stock matches static rules. System sees no issues.' },
     ],
-    'S-092': [
+    'P-092': [
       { part: 'PT08 - Charging Port', model: 'Galaxy S24', mtbf: '18m', fleetAge: '20m', fleetSize: 920, stock: 3, cost: 45, threshold: '10', action: 'Emergency PO', alert: 'Chronic Shortage', alertType: 'danger', insight: 'Burning 7-12 units/mo. Always reacting after stockouts.' },
     ],
-    'S-142': [
+    'P-142': [
       { part: 'PT01 - OLED Display', model: 'S24 Ultra', mtbf: '28m', fleetAge: '24m', fleetSize: 640, stock: 0, cost: 280, threshold: '15', action: 'Wait for PO', alert: 'Stockout Crisis', alertType: 'danger', insight: '14 open reservations. 0 parts in stock. Immediate SLA failure.' },
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '28m', fleetSize: 1120, stock: 12, cost: 35, threshold: '15', action: 'Standard PO', alert: 'Approaching Stockout', alertType: 'warning', insight: 'Fleet is hitting 2nd failure cycle. Static PO will be insufficient.' },
     ],
-    'S-187': [
+    'P-187': [
       { part: 'PT01 - OLED Display', model: 'S24 Ultra', mtbf: '28m', fleetAge: '24m', fleetSize: 310, stock: 4, cost: 280, threshold: '12', action: 'Wait for PO', alert: 'Low Stock', alertType: 'warning', insight: 'Silver SLA partner. System blindly holding parts here.' },
     ],
-    'S-210': [
+    'P-210': [
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '30m', fleetSize: 1120, stock: 8, cost: 35, threshold: '15', action: 'Standard PO', alert: 'Approaching Stockout', alertType: 'warning', insight: 'Stock below threshold. 1120 devices are well past the 2nd failure cycle (28m).' },
       { part: 'PT19 - Back Panel', model: 'Galaxy M34', mtbf: '48m', fleetAge: '31m', fleetSize: 960, stock: 0, cost: 25, threshold: '5', action: 'None', alert: 'Stockout', alertType: 'danger', insight: 'Zero stock. Local demand rising but hidden by static threshold.' }
+    ],
+    'P-301': [
+      { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '22m', fleetSize: 840, stock: 12, cost: 35, threshold: '15', action: 'None', alert: 'Normal', alertType: 'success', insight: 'Stock matches static rules.' }
+    ],
+    'P-404': [
+      { part: 'PT32 - Camera Module', model: 'Galaxy A54', mtbf: '36m', fleetAge: '34m', fleetSize: 620, stock: 5, cost: 65, threshold: '8', action: 'Emergency PO', alert: 'Low Stock', alertType: 'warning', insight: 'Standard rules only order when below 8 units.' }
     ]
   },
   TO_BE: {
-    'S-045': [
+    'P-045': [
       { part: 'PT19 - Back Panel', model: 'Galaxy M34', mtbf: '48m', fleetAge: '12m', fleetSize: 850, stock: 180, cost: 25, threshold: '2 (Dyn)', action: 'Auto-Transfer to Dallas', alert: 'Rebalancing', alertType: 'success', insight: 'AI flagged idle capital. Auto-drafted transfer of 50 units to Dallas.' },
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '10m', fleetSize: 1100, stock: 15, cost: 35, threshold: '12 (Dyn)', action: 'Optimized', alert: 'Healthy Buffer', alertType: 'success', insight: 'Fleet age is young. MTBF wave is 4 months away. Stock maintained.' },
     ],
-    'S-092': [
+    'P-092': [
       { part: 'PT08 - Charging Port', model: 'Galaxy S24', mtbf: '18m', fleetAge: '20m', fleetSize: 920, stock: 15, cost: 45, threshold: '22 (Dyn)', action: 'Proactive PO Triggered', alert: 'Matching Burn Rate', alertType: 'success', insight: 'Threshold adjusted to match actual consumption (12/mo). Shortages eliminated.' },
     ],
-    'S-142': [
+    'P-142': [
       { part: 'PT01 - OLED Display', model: 'S24 Ultra', mtbf: '28m', fleetAge: '24m', fleetSize: 640, stock: 0, cost: 280, threshold: '35 (Dyn)', action: 'Priority Allocation', alert: 'Crisis Intercepted', alertType: 'success', insight: 'AI rerouted customer to Store #187 while triggering emergency inbound stock.' },
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '28m', fleetSize: 1120, stock: 12, cost: 35, threshold: '42 (Dyn)', action: 'Wave Pre-order', alert: '2nd Cycle Wave Predicted', alertType: 'success', insight: '28m fleet age ÷ 14m MTBF = 2nd failure wave. Ordered 42 units pre-emptively.' },
     ],
-    'S-187': [
+    'P-187': [
       { part: 'PT01 - OLED Display', model: 'S24 Ultra', mtbf: '28m', fleetAge: '24m', fleetSize: 310, stock: 4, cost: 280, threshold: '18 (Dyn)', action: 'Allocation Deferred', alert: 'Redirect Executed', alertType: 'success', insight: 'Store successfully fulfilled redirect from Chicago #142 to save SLA.' },
     ],
-    'S-210': [
+    'P-210': [
       { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '30m', fleetSize: 1120, stock: 8, cost: 35, threshold: '38 (Dyn)', action: 'Partial Allocation', alert: 'Conflict Managed', alertType: 'success', insight: 'Shared limited warehouse stock with Chicago. Dallas received 9 units based on Gold SLA.' },
       { part: 'PT19 - Back Panel', model: 'Galaxy M34', mtbf: '48m', fleetAge: '31m', fleetSize: 960, stock: 50, cost: 25, threshold: '15 (Dyn)', action: 'Inbound Transfer', alert: 'Rebalanced from NY', alertType: 'success', insight: 'AI intercepted dead stock from New York and rerouted 50 units here. Cost: $0 net new.' }
+    ],
+    'P-301': [
+      { part: 'PT10 - Battery', model: 'Galaxy A54', mtbf: '14m', fleetAge: '22m', fleetSize: 840, stock: 12, cost: 35, threshold: '24 (Dyn)', action: 'Priority Order', alert: 'Healthy Buffer', alertType: 'success', insight: 'Install base aging rapidly toward 2nd MTBF cycle. Proactive buffering active.' }
+    ],
+    'P-404': [
+      { part: 'PT32 - Camera Module', model: 'Galaxy A54', mtbf: '36m', fleetAge: '34m', fleetSize: 620, stock: 5, cost: 65, threshold: '18 (Dyn)', action: 'Wave PO', alert: 'Impending Failure Wave', alertType: 'success', insight: 'High turnover predicted. AI auto-indexed inventory ahead of regional demand spike.' }
     ]
   }
 };

@@ -20,7 +20,7 @@ import PitchGuide from './components/views/PitchGuide';
 export default function App() {
   const [model, setModel] = useState('TO_BE');
   const [view, setView] = useState('SCOPE'); 
-  const [selectedPartner, setSelectedPartner] = useState('S-142');
+  const [selectedPartner, setSelectedPartner] = useState('P-142');
   const [selectedPart, setSelectedPart] = useState('PT10');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
