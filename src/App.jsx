@@ -11,6 +11,10 @@ import HealthMap from './components/views/HealthMap';
 import DemandGap from './components/views/DemandGap';
 import PartDeepDive from './components/views/PartDeepDive';
 import PartIntelligence from './components/views/PartIntelligence';
+import SinglePartEngine from './components/views/SinglePartEngine';
+import NetworkTree from './components/views/NetworkTree';
+import RebalancingSim from './components/views/RebalancingSim';
+import PolicyTable from './components/views/PolicyTable';
 import OemDashboard from './components/views/OemDashboard';
 import PartnerDiagnostics from './components/views/PartnerDiagnostics';
 import Scorecard from './components/views/Scorecard';
@@ -40,8 +44,12 @@ export default function App() {
       case 'VIEW_SIM': return <InterceptSim model={model} />;
       case 'VIEW_2': return <HealthMap model={model} />;
       case 'VIEW_3': return <DemandGap model={model} />;
+      case 'SINGLE_PART': return <SinglePartEngine model={model} />;
       case 'VIEW_4': return <PartDeepDive model={model} selectedPartner={selectedPartner} />;
       case 'VIEW_INTEL': return <PartIntelligence model={model} selectedPart={selectedPart} onPartChange={setSelectedPart} />;
+      case 'NETWORK_MAP': return <NetworkTree model={model} />;
+      case 'REBALANCING': return <RebalancingSim model={model} />;
+      case 'DYNAMIC_POLICY': return <PolicyTable model={model} />;
       case 'VIEW_5': return <Scorecard model={model} />;
       case 'OEM': return <OemDashboard model={model} />;
       case 'PARTNER': return <PartnerDiagnostics model={model} selectedPartner={selectedPartner} />;
@@ -66,13 +74,17 @@ export default function App() {
             <button onClick={() => setView('VIEW_QUEUE')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_QUEUE' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Reservation Queue</button>
             <button onClick={() => setView('VIEW_SIM')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_SIM' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Zap size={16} /> Live Intercept Sim</button>
             <button onClick={() => setView('VIEW_2')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_2' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Health Map</button>
-            <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Part Intelligence</button>
+            <button onClick={() => setView('NETWORK_MAP')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'NETWORK_MAP' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Live Topography</button>
+            <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Network Intelligence</button>
+            <button onClick={() => setView('SINGLE_PART')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'SINGLE_PART' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Single Part Engine</button>
+            <button onClick={() => setView('REBALANCING')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'REBALANCING' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><ArrowLeftRight size={16} /> Inter-Store Rebalance</button>
             <button onClick={() => setView('VIEW_3')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_3' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><ArrowLeftRight size={16} /> Supply vs Demand</button>
             <button onClick={() => setView('VIEW_4')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_4' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Zap size={16} /> Part Deep-Dive</button>
           </div>
           <div className="h-px w-full bg-gray-100 my-2"></div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Dashboards</p>
+            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Policy Dashboards</p>
+            <button onClick={() => setView('DYNAMIC_POLICY')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'DYNAMIC_POLICY' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Stocking Rules</button>
             <button onClick={() => setView('OEM')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'OEM' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Factory size={16} /> Network Hub</button>
             <button onClick={() => setView('PARTNER')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'PARTNER' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><MapPin size={16} /> Partner Detail</button>
             <button onClick={() => setView('VIEW_5')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all ${view === 'VIEW_5' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><BarChart3 size={16} /> Impact Scorecard</button>

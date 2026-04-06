@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, LineChart, Target, Zap, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ChevronDown, LineChart, Target, Zap, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { scopeDetails } from '../../data/mockData';
 
 export default function PartIntelligence({ model, selectedPart, onPartChange }) {
