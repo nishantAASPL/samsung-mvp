@@ -67,12 +67,647 @@ export const oemRequests = {
 };
 
 export const partners = [
-  { id: 'S-045', name: 'Store #045 - New York', region: 'Northeast', tier: 'Gold', backlog: 42, score: '91%' },
-  { id: 'S-092', name: 'Store #092 - Los Angeles', region: 'West', tier: 'Platinum', backlog: 45, score: '94%' },
-  { id: 'S-142', name: 'Store #142 - Chicago', region: 'Midwest', tier: 'Platinum', backlog: 124, score: '88%' },
-  { id: 'S-187', name: 'Store #187 - Naperville', region: 'Midwest', tier: 'Silver', backlog: 27, score: '82%' },
-  { id: 'S-210', name: 'Store #210 - Dallas', region: 'South', tier: 'Gold', backlog: 56, score: '89%' }
+  { id: 'P-045', name: 'Northeast Hub (NY)', region: 'Northeast', tier: 'Gold', backlog: 42, score: '91%' },
+  { id: 'P-092', name: 'West Coast Hub (LA)', region: 'West', tier: 'Platinum', backlog: 45, score: '94%' },
+  { id: 'P-142', name: 'Central Hub (CHI)', region: 'Midwest', tier: 'Platinum', backlog: 124, score: '88%' },
+  { id: 'P-187', name: 'Suburban Hub (NAP)', region: 'Midwest', tier: 'Silver', backlog: 27, score: '82%' },
+  { id: 'P-210', name: 'South Hub (DAL)', region: 'South', tier: 'Gold', backlog: 56, score: '89%' },
+  { id: 'P-301', name: 'Southeast Hub (MIA)', region: 'South', tier: 'Silver', backlog: 34, score: '85%' },
+  { id: 'P-404', name: 'Northwest Hub (SEA)', region: 'West', tier: 'Gold', backlog: 78, score: '90%' }
 ];
+
+export const networkStores = [
+  { id: 'NY-101', partnerId: 'P-045', location: 'Manhattan', stock: 0, asIsStock: 12, threshold: 10 },
+  { id: 'NY-102', partnerId: 'P-045', location: 'Brooklyn', stock: 45, asIsStock: 45, threshold: 10 },
+  { id: 'NY-103', partnerId: 'P-045', location: 'Queens', stock: 18, asIsStock: 2, threshold: 10 },
+  
+  { id: 'LA-201', partnerId: 'P-092', location: 'Downtown LA', stock: 2, asIsStock: 0, threshold: 15 },
+  { id: 'LA-202', partnerId: 'P-092', location: 'Santa Monica', stock: 35, asIsStock: 35, threshold: 15 },
+  { id: 'LA-203', partnerId: 'P-092', location: 'Pasadena', stock: 15, asIsStock: 5, threshold: 15 },
+  
+  { id: 'CH-301', partnerId: 'P-142', location: 'Loop Store', stock: 0, asIsStock: 12, threshold: 25 },
+  { id: 'CH-302', partnerId: 'P-142', location: 'Lincoln Park', stock: 65, asIsStock: 0, threshold: 25 },
+  { id: 'CH-303', partnerId: 'P-142', location: 'Wicker Park', stock: 22, asIsStock: 40, threshold: 25 },
+
+  { id: 'NA-401', partnerId: 'P-187', location: 'Naperville N', stock: 5, asIsStock: 5, threshold: 8 },
+  { id: 'NA-402', partnerId: 'P-187', location: 'Aurora Store', stock: 48, asIsStock: 10, threshold: 8 },
+  
+  { id: 'DA-501', partnerId: 'P-210', location: 'Dallas Central', stock: 0, asIsStock: 0, threshold: 20 },
+  { id: 'DA-502', partnerId: 'P-210', location: 'Plano Outlet', stock: 100, asIsStock: 100, threshold: 20 },
+  { id: 'DA-503', partnerId: 'P-210', location: 'Fort Worth', stock: 10, asIsStock: 2, threshold: 20 },
+  
+  { id: 'MI-601', partnerId: 'P-301', location: 'Miami Beach', stock: 1, asIsStock: 15, threshold: 5 },
+  { id: 'MI-602', partnerId: 'P-301', location: 'Coral Gables', stock: 75, asIsStock: 5, threshold: 5 },
+  { id: 'MI-603', partnerId: 'P-301', location: 'F. Lauderdale', stock: 12, asIsStock: 12, threshold: 5 },
+  
+  { id: 'SE-701', partnerId: 'P-404', location: 'Seattle Core', stock: 0, asIsStock: 25, threshold: 12 },
+  { id: 'SE-702', partnerId: 'P-404', location: 'Bellevue', stock: 15, asIsStock: 2, threshold: 12 },
+  { id: 'SE-703', partnerId: 'P-404', location: 'Tacoma', stock: 65, asIsStock: 5, threshold: 12 }
+];
+
+export const partIntelligenceData = {
+  'PT21': {
+    title: 'S24 Ultra Camera Module', cost: 120, globalBase: '36 Months', type: 'Cameras', risk: 'Low Failure Rate',
+    insightToBe: 'Predictive algorithm correctly applies 36 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '3,000', nextWave: 'Q1',
+    data: [
+      { month: 'Jan', historical: 17, forecast: null },
+      { month: 'Feb', historical: 14, forecast: null },
+      { month: 'Mar', historical: 42, forecast: null, outlier: true },
+      { month: 'Apr', historical: 18, forecast: null },
+      { month: 'May', historical: null, forecast: 14 },
+      { month: 'Jun', historical: null, forecast: 16 },
+      { month: 'Jul', historical: null, forecast: 15 },
+      { month: 'Aug', historical: null, forecast: 16 },
+      { month: 'Sep', historical: null, forecast: 14 },
+      { month: 'Oct', historical: null, forecast: 16 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 17, forecast: null },
+      { month: 'Feb', historical: 14, forecast: null },
+      { month: 'Mar', historical: 42, forecast: null },
+      { month: 'Apr', historical: 18, forecast: null },
+      { month: 'May', historical: null, forecast: 42 },
+      { month: 'Jun', historical: null, forecast: 42 },
+      { month: 'Jul', historical: null, forecast: 42 },
+      { month: 'Aug', historical: null, forecast: 42 },
+      { month: 'Sep', historical: null, forecast: 42 },
+      { month: 'Oct', historical: null, forecast: 42 }
+    ]
+  },
+  'PT22': {
+    title: 'S24 Ultra S-Pen', cost: 45, globalBase: '12 Months', type: 'Accessories', risk: 'High Loss Rate',
+    insightToBe: 'Predictive algorithm correctly applies 12 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '2,000', nextWave: 'Q3',
+    data: [
+      { month: 'Jan', historical: 27, forecast: null },
+      { month: 'Feb', historical: 26, forecast: null },
+      { month: 'Mar', historical: 69, forecast: null, outlier: true },
+      { month: 'Apr', historical: 26, forecast: null },
+      { month: 'May', historical: null, forecast: 23 },
+      { month: 'Jun', historical: null, forecast: 24 },
+      { month: 'Jul', historical: null, forecast: 26 },
+      { month: 'Aug', historical: null, forecast: 23 },
+      { month: 'Sep', historical: null, forecast: 25 },
+      { month: 'Oct', historical: null, forecast: 26 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 27, forecast: null },
+      { month: 'Feb', historical: 26, forecast: null },
+      { month: 'Mar', historical: 69, forecast: null },
+      { month: 'Apr', historical: 26, forecast: null },
+      { month: 'May', historical: null, forecast: 69 },
+      { month: 'Jun', historical: null, forecast: 69 },
+      { month: 'Jul', historical: null, forecast: 69 },
+      { month: 'Aug', historical: null, forecast: 69 },
+      { month: 'Sep', historical: null, forecast: 69 },
+      { month: 'Oct', historical: null, forecast: 69 }
+    ]
+  },
+  'PT23': {
+    title: 'S23 Battery', cost: 35, globalBase: '18 Months', type: 'Batteries', risk: 'MTBF Wave Approaching',
+    insightToBe: 'Predictive algorithm correctly applies 18 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '8,000', nextWave: 'Q4',
+    data: [
+      { month: 'Jan', historical: 29, forecast: null },
+      { month: 'Feb', historical: 32, forecast: null },
+      { month: 'Mar', historical: 84, forecast: null, outlier: true },
+      { month: 'Apr', historical: 28, forecast: null },
+      { month: 'May', historical: null, forecast: 32 },
+      { month: 'Jun', historical: null, forecast: 28 },
+      { month: 'Jul', historical: null, forecast: 31 },
+      { month: 'Aug', historical: null, forecast: 31 },
+      { month: 'Sep', historical: null, forecast: 30 },
+      { month: 'Oct', historical: null, forecast: 29 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 29, forecast: null },
+      { month: 'Feb', historical: 32, forecast: null },
+      { month: 'Mar', historical: 84, forecast: null },
+      { month: 'Apr', historical: 28, forecast: null },
+      { month: 'May', historical: null, forecast: 84 },
+      { month: 'Jun', historical: null, forecast: 84 },
+      { month: 'Jul', historical: null, forecast: 84 },
+      { month: 'Aug', historical: null, forecast: 84 },
+      { month: 'Sep', historical: null, forecast: 84 },
+      { month: 'Oct', historical: null, forecast: 84 }
+    ]
+  },
+  'PT24': {
+    title: 'S23 Screen Assembly', cost: 210, globalBase: '24 Months', type: 'Displays', risk: 'Accidental Damage Driven',
+    insightToBe: 'Predictive algorithm correctly applies 24 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '5,000', nextWave: 'Q3',
+    data: [
+      { month: 'Jan', historical: 17, forecast: null },
+      { month: 'Feb', historical: 18, forecast: null },
+      { month: 'Mar', historical: 48, forecast: null, outlier: true },
+      { month: 'Apr', historical: 16, forecast: null },
+      { month: 'May', historical: null, forecast: 19 },
+      { month: 'Jun', historical: null, forecast: 16 },
+      { month: 'Jul', historical: null, forecast: 17 },
+      { month: 'Aug', historical: null, forecast: 20 },
+      { month: 'Sep', historical: null, forecast: 18 },
+      { month: 'Oct', historical: null, forecast: 18 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 17, forecast: null },
+      { month: 'Feb', historical: 18, forecast: null },
+      { month: 'Mar', historical: 48, forecast: null },
+      { month: 'Apr', historical: 16, forecast: null },
+      { month: 'May', historical: null, forecast: 48 },
+      { month: 'Jun', historical: null, forecast: 48 },
+      { month: 'Jul', historical: null, forecast: 48 },
+      { month: 'Aug', historical: null, forecast: 48 },
+      { month: 'Sep', historical: null, forecast: 48 },
+      { month: 'Oct', historical: null, forecast: 48 }
+    ]
+  },
+  'PT25': {
+    title: 'Z Fold 5 Inner Display', cost: 480, globalBase: '24 Months', type: 'Displays', risk: 'High Cost Critical Component',
+    insightToBe: 'Predictive algorithm correctly applies 24 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '13,000', nextWave: 'Q2',
+    data: [
+      { month: 'Jan', historical: 21, forecast: null },
+      { month: 'Feb', historical: 22, forecast: null },
+      { month: 'Mar', historical: 54, forecast: null, outlier: true },
+      { month: 'Apr', historical: 22, forecast: null },
+      { month: 'May', historical: null, forecast: 19 },
+      { month: 'Jun', historical: null, forecast: 18 },
+      { month: 'Jul', historical: null, forecast: 20 },
+      { month: 'Aug', historical: null, forecast: 22 },
+      { month: 'Sep', historical: null, forecast: 22 },
+      { month: 'Oct', historical: null, forecast: 21 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 21, forecast: null },
+      { month: 'Feb', historical: 22, forecast: null },
+      { month: 'Mar', historical: 54, forecast: null },
+      { month: 'Apr', historical: 22, forecast: null },
+      { month: 'May', historical: null, forecast: 54 },
+      { month: 'Jun', historical: null, forecast: 54 },
+      { month: 'Jul', historical: null, forecast: 54 },
+      { month: 'Aug', historical: null, forecast: 54 },
+      { month: 'Sep', historical: null, forecast: 54 },
+      { month: 'Oct', historical: null, forecast: 54 }
+    ]
+  },
+  'PT26': {
+    title: 'Z Fold 5 Hinge Mechanism', cost: 85, globalBase: '30 Months', type: 'Mechanicals', risk: 'Wear and Tear Baseline',
+    insightToBe: 'Predictive algorithm correctly applies 30 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '14,000', nextWave: 'Q4',
+    data: [
+      { month: 'Jan', historical: 26, forecast: null },
+      { month: 'Feb', historical: 24, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null, outlier: true },
+      { month: 'Apr', historical: 24, forecast: null },
+      { month: 'May', historical: null, forecast: 24 },
+      { month: 'Jun', historical: null, forecast: 27 },
+      { month: 'Jul', historical: null, forecast: 26 },
+      { month: 'Aug', historical: null, forecast: 25 },
+      { month: 'Sep', historical: null, forecast: 27 },
+      { month: 'Oct', historical: null, forecast: 26 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 26, forecast: null },
+      { month: 'Feb', historical: 24, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null },
+      { month: 'Apr', historical: 24, forecast: null },
+      { month: 'May', historical: null, forecast: 72 },
+      { month: 'Jun', historical: null, forecast: 72 },
+      { month: 'Jul', historical: null, forecast: 72 },
+      { month: 'Aug', historical: null, forecast: 72 },
+      { month: 'Sep', historical: null, forecast: 72 },
+      { month: 'Oct', historical: null, forecast: 72 }
+    ]
+  },
+  'PT27': {
+    title: 'Z Flip 5 Cover Screen', cost: 110, globalBase: '24 Months', type: 'Displays', risk: 'Accidental Damage Driven',
+    insightToBe: 'Predictive algorithm correctly applies 24 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '11,000', nextWave: 'Q1',
+    data: [
+      { month: 'Jan', historical: 21, forecast: null },
+      { month: 'Feb', historical: 21, forecast: null },
+      { month: 'Mar', historical: 60, forecast: null, outlier: true },
+      { month: 'Apr', historical: 20, forecast: null },
+      { month: 'May', historical: null, forecast: 23 },
+      { month: 'Jun', historical: null, forecast: 24 },
+      { month: 'Jul', historical: null, forecast: 24 },
+      { month: 'Aug', historical: null, forecast: 21 },
+      { month: 'Sep', historical: null, forecast: 21 },
+      { month: 'Oct', historical: null, forecast: 23 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 21, forecast: null },
+      { month: 'Feb', historical: 21, forecast: null },
+      { month: 'Mar', historical: 60, forecast: null },
+      { month: 'Apr', historical: 20, forecast: null },
+      { month: 'May', historical: null, forecast: 60 },
+      { month: 'Jun', historical: null, forecast: 60 },
+      { month: 'Jul', historical: null, forecast: 60 },
+      { month: 'Aug', historical: null, forecast: 60 },
+      { month: 'Sep', historical: null, forecast: 60 },
+      { month: 'Oct', historical: null, forecast: 60 }
+    ]
+  },
+  'PT28': {
+    title: 'A34 Display', cost: 140, globalBase: '36 Months', type: 'Displays', risk: 'Budget Tier Volume',
+    insightToBe: 'Predictive algorithm correctly applies 36 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '10,000', nextWave: 'Q3',
+    data: [
+      { month: 'Jan', historical: 20, forecast: null },
+      { month: 'Feb', historical: 21, forecast: null },
+      { month: 'Mar', historical: 51, forecast: null, outlier: true },
+      { month: 'Apr', historical: 21, forecast: null },
+      { month: 'May', historical: null, forecast: 17 },
+      { month: 'Jun', historical: null, forecast: 18 },
+      { month: 'Jul', historical: null, forecast: 18 },
+      { month: 'Aug', historical: null, forecast: 20 },
+      { month: 'Sep', historical: null, forecast: 20 },
+      { month: 'Oct', historical: null, forecast: 21 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 20, forecast: null },
+      { month: 'Feb', historical: 21, forecast: null },
+      { month: 'Mar', historical: 51, forecast: null },
+      { month: 'Apr', historical: 21, forecast: null },
+      { month: 'May', historical: null, forecast: 51 },
+      { month: 'Jun', historical: null, forecast: 51 },
+      { month: 'Jul', historical: null, forecast: 51 },
+      { month: 'Aug', historical: null, forecast: 51 },
+      { month: 'Sep', historical: null, forecast: 51 },
+      { month: 'Oct', historical: null, forecast: 51 }
+    ]
+  },
+  'PT29': {
+    title: 'A34 Battery', cost: 25, globalBase: '18 Months', type: 'Batteries', risk: 'High Turn, Low Cost',
+    insightToBe: 'Predictive algorithm correctly applies 18 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '10,000', nextWave: 'Q4',
+    data: [
+      { month: 'Jan', historical: 30, forecast: null },
+      { month: 'Feb', historical: 29, forecast: null },
+      { month: 'Mar', historical: 78, forecast: null, outlier: true },
+      { month: 'Apr', historical: 29, forecast: null },
+      { month: 'May', historical: null, forecast: 29 },
+      { month: 'Jun', historical: null, forecast: 29 },
+      { month: 'Jul', historical: null, forecast: 26 },
+      { month: 'Aug', historical: null, forecast: 29 },
+      { month: 'Sep', historical: null, forecast: 29 },
+      { month: 'Oct', historical: null, forecast: 30 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 30, forecast: null },
+      { month: 'Feb', historical: 29, forecast: null },
+      { month: 'Mar', historical: 78, forecast: null },
+      { month: 'Apr', historical: 29, forecast: null },
+      { month: 'May', historical: null, forecast: 78 },
+      { month: 'Jun', historical: null, forecast: 78 },
+      { month: 'Jul', historical: null, forecast: 78 },
+      { month: 'Aug', historical: null, forecast: 78 },
+      { month: 'Sep', historical: null, forecast: 78 },
+      { month: 'Oct', historical: null, forecast: 78 }
+    ]
+  },
+  'PT30': {
+    title: 'S22 Ultra Battery', cost: 40, globalBase: '18 Months', type: 'Batteries', risk: 'Third MTBF Cycle',
+    insightToBe: 'Predictive algorithm correctly applies 18 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '5,000', nextWave: 'Q2',
+    data: [
+      { month: 'Jan', historical: 24, forecast: null },
+      { month: 'Feb', historical: 25, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null, outlier: true },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: null, forecast: 27 },
+      { month: 'Jun', historical: null, forecast: 25 },
+      { month: 'Jul', historical: null, forecast: 25 },
+      { month: 'Aug', historical: null, forecast: 25 },
+      { month: 'Sep', historical: null, forecast: 28 },
+      { month: 'Oct', historical: null, forecast: 27 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 24, forecast: null },
+      { month: 'Feb', historical: 25, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: null, forecast: 72 },
+      { month: 'Jun', historical: null, forecast: 72 },
+      { month: 'Jul', historical: null, forecast: 72 },
+      { month: 'Aug', historical: null, forecast: 72 },
+      { month: 'Sep', historical: null, forecast: 72 },
+      { month: 'Oct', historical: null, forecast: 72 }
+    ]
+  },
+  'PT31': {
+    title: 'S22 Motherboard (256GB)', cost: 320, globalBase: '48 Months', type: 'Logic Boards', risk: 'High Cost, Dead Stock Risk',
+    insightToBe: 'Predictive algorithm correctly applies 48 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '7,000', nextWave: 'Q1',
+    data: [
+      { month: 'Jan', historical: 19, forecast: null },
+      { month: 'Feb', historical: 16, forecast: null },
+      { month: 'Mar', historical: 45, forecast: null, outlier: true },
+      { month: 'Apr', historical: 19, forecast: null },
+      { month: 'May', historical: null, forecast: 17 },
+      { month: 'Jun', historical: null, forecast: 16 },
+      { month: 'Jul', historical: null, forecast: 16 },
+      { month: 'Aug', historical: null, forecast: 15 },
+      { month: 'Sep', historical: null, forecast: 16 },
+      { month: 'Oct', historical: null, forecast: 17 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 19, forecast: null },
+      { month: 'Feb', historical: 16, forecast: null },
+      { month: 'Mar', historical: 45, forecast: null },
+      { month: 'Apr', historical: 19, forecast: null },
+      { month: 'May', historical: null, forecast: 45 },
+      { month: 'Jun', historical: null, forecast: 45 },
+      { month: 'Jul', historical: null, forecast: 45 },
+      { month: 'Aug', historical: null, forecast: 45 },
+      { month: 'Sep', historical: null, forecast: 45 },
+      { month: 'Oct', historical: null, forecast: 45 }
+    ]
+  },
+  'PT32': {
+    title: 'A54 Camera Module', cost: 65, globalBase: '36 Months', type: 'Cameras', risk: 'Low Volume Draw',
+    insightToBe: 'Predictive algorithm correctly applies 36 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '16,000', nextWave: 'Q3',
+    data: [
+      { month: 'Jan', historical: 27, forecast: null },
+      { month: 'Feb', historical: 30, forecast: null },
+      { month: 'Mar', historical: 81, forecast: null, outlier: true },
+      { month: 'Apr', historical: 31, forecast: null },
+      { month: 'May', historical: null, forecast: 29 },
+      { month: 'Jun', historical: null, forecast: 27 },
+      { month: 'Jul', historical: null, forecast: 27 },
+      { month: 'Aug', historical: null, forecast: 28 },
+      { month: 'Sep', historical: null, forecast: 29 },
+      { month: 'Oct', historical: null, forecast: 29 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 27, forecast: null },
+      { month: 'Feb', historical: 30, forecast: null },
+      { month: 'Mar', historical: 81, forecast: null },
+      { month: 'Apr', historical: 31, forecast: null },
+      { month: 'May', historical: null, forecast: 81 },
+      { month: 'Jun', historical: null, forecast: 81 },
+      { month: 'Jul', historical: null, forecast: 81 },
+      { month: 'Aug', historical: null, forecast: 81 },
+      { month: 'Sep', historical: null, forecast: 81 },
+      { month: 'Oct', historical: null, forecast: 81 }
+    ]
+  },
+  'PT33': {
+    title: 'S23 FE Back Glass', cost: 30, globalBase: '48 Months', type: 'Back Panels', risk: 'Cosmetic Excess Inventory',
+    insightToBe: 'Predictive algorithm correctly applies 48 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '2,000', nextWave: 'Q4',
+    data: [
+      { month: 'Jan', historical: 29, forecast: null },
+      { month: 'Feb', historical: 31, forecast: null },
+      { month: 'Mar', historical: 81, forecast: null, outlier: true },
+      { month: 'Apr', historical: 29, forecast: null },
+      { month: 'May', historical: null, forecast: 29 },
+      { month: 'Jun', historical: null, forecast: 28 },
+      { month: 'Jul', historical: null, forecast: 28 },
+      { month: 'Aug', historical: null, forecast: 31 },
+      { month: 'Sep', historical: null, forecast: 27 },
+      { month: 'Oct', historical: null, forecast: 31 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 29, forecast: null },
+      { month: 'Feb', historical: 31, forecast: null },
+      { month: 'Mar', historical: 81, forecast: null },
+      { month: 'Apr', historical: 29, forecast: null },
+      { month: 'May', historical: null, forecast: 81 },
+      { month: 'Jun', historical: null, forecast: 81 },
+      { month: 'Jul', historical: null, forecast: 81 },
+      { month: 'Aug', historical: null, forecast: 81 },
+      { month: 'Sep', historical: null, forecast: 81 },
+      { month: 'Oct', historical: null, forecast: 81 }
+    ]
+  },
+  'PT34': {
+    title: 'M34 AMOLED Display', cost: 95, globalBase: '36 Months', type: 'Displays', risk: 'Budget Tier Dead Stock',
+    insightToBe: 'Predictive algorithm correctly applies 36 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '6,000', nextWave: 'Q2',
+    data: [
+      { month: 'Jan', historical: 14, forecast: null },
+      { month: 'Feb', historical: 16, forecast: null },
+      { month: 'Mar', historical: 36, forecast: null, outlier: true },
+      { month: 'Apr', historical: 15, forecast: null },
+      { month: 'May', historical: null, forecast: 15 },
+      { month: 'Jun', historical: null, forecast: 15 },
+      { month: 'Jul', historical: null, forecast: 14 },
+      { month: 'Aug', historical: null, forecast: 14 },
+      { month: 'Sep', historical: null, forecast: 15 },
+      { month: 'Oct', historical: null, forecast: 12 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 14, forecast: null },
+      { month: 'Feb', historical: 16, forecast: null },
+      { month: 'Mar', historical: 36, forecast: null },
+      { month: 'Apr', historical: 15, forecast: null },
+      { month: 'May', historical: null, forecast: 36 },
+      { month: 'Jun', historical: null, forecast: 36 },
+      { month: 'Jul', historical: null, forecast: 36 },
+      { month: 'Aug', historical: null, forecast: 36 },
+      { month: 'Sep', historical: null, forecast: 36 },
+      { month: 'Oct', historical: null, forecast: 36 }
+    ]
+  },
+  'PT35': {
+    title: 'Z Fold 4 Screen Protector', cost: 15, globalBase: '6 Months', type: 'Accessories', risk: 'Extreme High Turnover',
+    insightToBe: 'Predictive algorithm correctly applies 6 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '6,000', nextWave: 'Q1',
+    data: [
+      { month: 'Jan', historical: 28, forecast: null },
+      { month: 'Feb', historical: 24, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null, outlier: true },
+      { month: 'Apr', historical: 27, forecast: null },
+      { month: 'May', historical: null, forecast: 27 },
+      { month: 'Jun', historical: null, forecast: 26 },
+      { month: 'Jul', historical: null, forecast: 24 },
+      { month: 'Aug', historical: null, forecast: 27 },
+      { month: 'Sep', historical: null, forecast: 28 },
+      { month: 'Oct', historical: null, forecast: 26 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 28, forecast: null },
+      { month: 'Feb', historical: 24, forecast: null },
+      { month: 'Mar', historical: 72, forecast: null },
+      { month: 'Apr', historical: 27, forecast: null },
+      { month: 'May', historical: null, forecast: 72 },
+      { month: 'Jun', historical: null, forecast: 72 },
+      { month: 'Jul', historical: null, forecast: 72 },
+      { month: 'Aug', historical: null, forecast: 72 },
+      { month: 'Sep', historical: null, forecast: 72 },
+      { month: 'Oct', historical: null, forecast: 72 }
+    ]
+  },
+  'PT36': {
+    title: 'Galaxy Watch 6 Battery', cost: 20, globalBase: '24 Months', type: 'Batteries', risk: 'Steady MTBF Baseline',
+    insightToBe: 'Predictive algorithm correctly applies 24 Months MTBF smoothing to incoming request waves.',
+    insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
+    globalInventory: '4,000', nextWave: 'Q4',
+    data: [
+      { month: 'Jan', historical: 18, forecast: null },
+      { month: 'Feb', historical: 22, forecast: null },
+      { month: 'Mar', historical: 54, forecast: null, outlier: true },
+      { month: 'Apr', historical: 18, forecast: null },
+      { month: 'May', historical: null, forecast: 18 },
+      { month: 'Jun', historical: null, forecast: 22 },
+      { month: 'Jul', historical: null, forecast: 19 },
+      { month: 'Aug', historical: null, forecast: 19 },
+      { month: 'Sep', historical: null, forecast: 20 },
+      { month: 'Oct', historical: null, forecast: 19 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 18, forecast: null },
+      { month: 'Feb', historical: 22, forecast: null },
+      { month: 'Mar', historical: 54, forecast: null },
+      { month: 'Apr', historical: 18, forecast: null },
+      { month: 'May', historical: null, forecast: 54 },
+      { month: 'Jun', historical: null, forecast: 54 },
+      { month: 'Jul', historical: null, forecast: 54 },
+      { month: 'Aug', historical: null, forecast: 54 },
+      { month: 'Sep', historical: null, forecast: 54 },
+      { month: 'Oct', historical: null, forecast: 54 }
+    ]
+  },
+
+  'PT10': {
+    title: 'A54 Battery', cost: 35, globalBase: '14 Months', type: 'Batteries', risk: 'MTBF Driven, High Turn',
+    insightToBe: 'AI correctly identifies March anomaly as a corporate replacement drive, reverting baseline. Flags impending MTBF wave.',
+    insightAsIs: 'Legacy moving averages interpret the March anomalous spike as permanent growth, risking massive dead stock.',
+    globalInventory: '14,200', nextWave: 'Q3',
+    data: [
+      { month: 'Jan', historical: 40, forecast: null },
+      { month: 'Feb', historical: 45, forecast: null },
+      { month: 'Mar', historical: 120, forecast: null, outlier: true },
+      { month: 'Apr', historical: 55, forecast: null },
+      { month: 'May', historical: 60, forecast: 60 },
+      { month: 'Jun', historical: null, forecast: 65 },
+      { month: 'Jul', historical: null, forecast: 40 },
+      { month: 'Aug', historical: null, forecast: 30 },
+      { month: 'Sep', historical: null, forecast: 25 },
+      { month: 'Oct', historical: null, forecast: 22 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 40, forecast: null },
+      { month: 'Feb', historical: 45, forecast: null },
+      { month: 'Mar', historical: 120, forecast: null }, 
+      { month: 'Apr', historical: 55, forecast: null },
+      { month: 'May', historical: 60, forecast: 60 },
+      { month: 'Jun', historical: null, forecast: 90 },
+      { month: 'Jul', historical: null, forecast: 85 }, 
+      { month: 'Aug', historical: null, forecast: 85 },
+      { month: 'Sep', historical: null, forecast: 85 },
+      { month: 'Oct', historical: null, forecast: 85 }
+    ]
+  },
+  'PT01': {
+    title: 'S24U OLED Display', cost: 280, globalBase: '28 Months', type: 'Displays', risk: 'High Cost, Low Volume',
+    insightToBe: 'Flagged upcoming high-stress failure period in August. Actively buffering Tier 1 nodes defensively against SLA loss.',
+    insightAsIs: 'Constant flatline historical mapping. Fails entirely to understand the device aging curve resulting in massive Q3 stockouts.',
+    globalInventory: '2,840', nextWave: 'Aug',
+    data: [
+      { month: 'Jan', historical: 8, forecast: null },
+      { month: 'Feb', historical: 10, forecast: null },
+      { month: 'Mar', historical: 12, forecast: null },
+      { month: 'Apr', historical: 15, forecast: null },
+      { month: 'May', historical: 14, forecast: 14 },
+      { month: 'Jun', historical: null, forecast: 18 },
+      { month: 'Jul', historical: null, forecast: 35 },
+      { month: 'Aug', historical: null, forecast: 55 }, // High failure zone
+      { month: 'Sep', historical: null, forecast: 25 },
+      { month: 'Oct', historical: null, forecast: 15 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 8, forecast: null },
+      { month: 'Feb', historical: 10, forecast: null },
+      { month: 'Mar', historical: 12, forecast: null },
+      { month: 'Apr', historical: 15, forecast: null },
+      { month: 'May', historical: 14, forecast: 14 },
+      { month: 'Jun', historical: null, forecast: 14 },
+      { month: 'Jul', historical: null, forecast: 14 },
+      { month: 'Aug', historical: null, forecast: 14 },
+      { month: 'Sep', historical: null, forecast: 14 },
+      { month: 'Oct', historical: null, forecast: 14 }
+    ]
+  },
+  'PT08': {
+    title: 'S24 Charging Port', cost: 45, globalBase: '18 Months', type: 'Charging Ports', risk: 'Chronic Shortage Risk',
+    insightToBe: 'Identifying a seasonal anomaly matching summer humidity factors. Bypassing rigid logic to over-index coastal nodes.',
+    insightAsIs: 'Standard algorithms fail to interpret seasonal or geographical data mapping, consistently under-ordering.',
+    globalInventory: '8,400', nextWave: 'May',
+    data: [
+      { month: 'Jan', historical: 14, forecast: null },
+      { month: 'Feb', historical: 15, forecast: null },
+      { month: 'Mar', historical: 18, forecast: null },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: 35, forecast: 35 }, // summer spike
+      { month: 'Jun', historical: null, forecast: 40 },
+      { month: 'Jul', historical: null, forecast: 42 },
+      { month: 'Aug', historical: null, forecast: 20 },
+      { month: 'Sep', historical: null, forecast: 15 },
+      { month: 'Oct', historical: null, forecast: 15 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 14, forecast: null },
+      { month: 'Feb', historical: 15, forecast: null },
+      { month: 'Mar', historical: 18, forecast: null },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: 35, forecast: 35 },
+      { month: 'Jun', historical: null, forecast: 25 },
+      { month: 'Jul', historical: null, forecast: 25 },
+      { month: 'Aug', historical: null, forecast: 25 },
+      { month: 'Sep', historical: null, forecast: 25 },
+      { month: 'Oct', historical: null, forecast: 25 }
+    ]
+  },
+  'PT19': {
+    title: 'M34 Back Panel', cost: 25, globalBase: '48 Months', type: 'Back Panels', risk: 'Severe Dead Stock',
+    insightToBe: 'Long life cycle recognized. Immediate PO halt applied while liquidating existing network oversupply.',
+    insightAsIs: 'Continues compounding inventory due to false minimum requirement logic ignoring massive 48 month span.',
+    globalInventory: '19,500', nextWave: '2028',
+    data: [
+      { month: 'Jan', historical: 60, forecast: null },
+      { month: 'Feb', historical: 55, forecast: null },
+      { month: 'Mar', historical: 40, forecast: null },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: 10, forecast: 10 },
+      { month: 'Jun', historical: null, forecast: 0 },
+      { month: 'Jul', historical: null, forecast: 0 },
+      { month: 'Aug', historical: null, forecast: 0 },
+      { month: 'Sep', historical: null, forecast: 0 },
+      { month: 'Oct', historical: null, forecast: 0 }
+    ],
+    asIsData: [
+      { month: 'Jan', historical: 60, forecast: null },
+      { month: 'Feb', historical: 55, forecast: null },
+      { month: 'Mar', historical: 40, forecast: null },
+      { month: 'Apr', historical: 25, forecast: null },
+      { month: 'May', historical: 10, forecast: 10 },
+      { month: 'Jun', historical: null, forecast: 30 },
+      { month: 'Jul', historical: null, forecast: 30 },
+      { month: 'Aug', historical: null, forecast: 30 },
+      { month: 'Sep', historical: null, forecast: 30 },
+      { month: 'Oct', historical: null, forecast: 30 }
+    ]
+  }
+};
 
 export const scopeDetails = {
   models: ['Galaxy S24 Ultra', 'Galaxy S24', 'Galaxy A54', 'Galaxy A34', 'Galaxy M34'],

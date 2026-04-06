@@ -6,12 +6,9 @@ import { partners } from './data/mockData';
 import ScopeView from './components/views/ScopeView';
 import EngineView from './components/views/EngineView';
 import ReservationQueue from './components/views/ReservationQueue';
-import InterceptSim from './components/views/InterceptSim';
 import HealthMap from './components/views/HealthMap';
 import DemandGap from './components/views/DemandGap';
-import PartDeepDive from './components/views/PartDeepDive';
 import PartIntelligence from './components/views/PartIntelligence';
-import SinglePartEngine from './components/views/SinglePartEngine';
 import NetworkTree from './components/views/NetworkTree';
 import RebalancingSim from './components/views/RebalancingSim';
 import PolicyTable from './components/views/PolicyTable';
@@ -41,11 +38,8 @@ export default function App() {
       case 'SCOPE': return <ScopeView model={model} />;
       case 'ENGINE': return <EngineView model={model} />;
       case 'VIEW_QUEUE': return <ReservationQueue model={model} />;
-      case 'VIEW_SIM': return <InterceptSim model={model} />;
       case 'VIEW_2': return <HealthMap model={model} />;
       case 'VIEW_3': return <DemandGap model={model} />;
-      case 'SINGLE_PART': return <SinglePartEngine model={model} />;
-      case 'VIEW_4': return <PartDeepDive model={model} selectedPartner={selectedPartner} />;
       case 'VIEW_INTEL': return <PartIntelligence model={model} selectedPart={selectedPart} onPartChange={setSelectedPart} />;
       case 'NETWORK_MAP': return <NetworkTree model={model} />;
       case 'REBALANCING': return <RebalancingSim model={model} />;
@@ -76,10 +70,8 @@ export default function App() {
             <button onClick={() => setView('VIEW_2')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_2' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Health Map</button>
             <button onClick={() => setView('NETWORK_MAP')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'NETWORK_MAP' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Live Topography</button>
             <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Network Intelligence</button>
-            <button onClick={() => setView('SINGLE_PART')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'SINGLE_PART' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Single Part Engine</button>
             <button onClick={() => setView('REBALANCING')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'REBALANCING' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><ArrowLeftRight size={16} /> Inter-Store Rebalance</button>
             <button onClick={() => setView('VIEW_3')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_3' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><ArrowLeftRight size={16} /> Supply vs Demand</button>
-            <button onClick={() => setView('VIEW_4')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_4' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Zap size={16} /> Part Deep-Dive</button>
           </div>
           <div className="h-px w-full bg-gray-100 my-2"></div>
           <div>
@@ -89,9 +81,9 @@ export default function App() {
             <button onClick={() => setView('PARTNER')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'PARTNER' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><MapPin size={16} /> Partner Detail</button>
             <button onClick={() => setView('VIEW_5')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all ${view === 'VIEW_5' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><BarChart3 size={16} /> Impact Scorecard</button>
           </div>
-          {(view === 'VIEW_4' || view === 'PARTNER') && (
+          {(view === 'NETWORK_MAP' || view === 'REBALANCING' || view === 'PARTNER') && (
             <div className="space-y-1 pt-4 border-t border-gray-100 mt-2">
-              <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Store Selector</p>
+              <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Partner Selector</p>
               {partners.map(p => (
                 <button key={p.id} onClick={() => setSelectedPartner(p.id)} className={`w-full flex flex-col items-start px-3 py-2 rounded transition-all border ${selectedPartner === p.id ? 'bg-[#EBF0FA] border-blue-200' : 'border-transparent hover:bg-gray-50'}`}>
                   <span className={`text-xs font-bold ${selectedPartner === p.id ? 'text-[#1428A0]' : 'text-gray-800'}`}>{p.id}</span>
