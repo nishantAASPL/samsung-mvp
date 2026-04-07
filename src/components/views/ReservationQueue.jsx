@@ -1,14 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
-  MapPin, CheckCircle2, AlertTriangle, XCircle, ChevronDown, Phone, TrendingUp,
-  Clock, User, Wrench, Filter, Search, BarChart3, Activity, Calendar,
-  ArrowUpRight, ArrowDownRight, History, Inbox, Star, RefreshCw, Download,
-  ChevronRight, Shield, Zap, Package
+  MapPin, CheckCircle2, AlertTriangle, Clock, User, Wrench, Filter, Search,
+  BarChart3, Activity, Calendar, ArrowUpRight, ArrowDownRight, History, Inbox,
+  Star, RefreshCw, Download, Shield, Zap, Package, TrendingUp, TrendingDown,
+  Award, Globe, AlertCircle, Info, Target, Layers, Phone, XCircle, ChevronDown
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend,
-  ComposedChart, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
+  ComposedChart, ReferenceLine
 } from 'recharts';
 import { oemMetrics } from '../../data/mockData';
 
@@ -78,121 +78,107 @@ const historicalRequests = [
   { id: 'REQ-20260404-011', device: 'Galaxy S24 Ultra', part: PARTS.PT01, store: 'Store #142 (CHI)', status: 'RESCHEDULED', date: 'Apr 4', resolution: '--', outcome: 'Customer No-Show', technician: 'Marcus T.', customer: 'C-44001', warranty: 'Out of Warranty' }
 ];
 
-// ─── ANALYTICS DATA ───────────────────────────────────────────────────────────
-const regionalDistributionData = [
-  { region: 'Northeast', requests: 145, color: '#6366F1' },
-  { region: 'Midwest', requests: 112, color: '#10B981' },
-  { region: 'South', requests: 88, color: '#F59E0B' },
-  { region: 'West', requests: 132, color: '#8B5CF6' },
-  { region: 'Southeast', requests: 65, color: '#06B6D4' }
+// ─── REPAIR PERFORMANCE DATA ──────────────────────────────────────────────────
+const historicalRepairData = [
+  { month: 'Jan', volume: 142, resolved: 118, escalated: 12, rescheduled: 12, ftfr: 83, avgTime: 3.8 },
+  { month: 'Feb', volume: 158, resolved: 132, escalated: 14, rescheduled: 12, ftfr: 84, avgTime: 3.6 },
+  { month: 'Mar', volume: 172, resolved: 148, escalated: 11, rescheduled: 13, ftfr: 86, avgTime: 3.1 },
+  { month: 'Apr', volume: 47, resolved: 43, escalated: 2, rescheduled: 2, ftfr: 91, avgTime: 2.4 },
 ];
 
-const warrantyMixData = [
-  { name: 'In Warranty', value: 68, color: '#10B981' },
-  { name: 'Out of Warranty', value: 32, color: '#9CA3AF' }
+const ftfrByModelData = [
+  { month: 'Jan', 'S24 Ultra': 71, 'A54': 88, 'M34': 82, 'Z Fold4': 65 },
+  { month: 'Feb', 'S24 Ultra': 73, 'A54': 89, 'M34': 84, 'Z Fold4': 67 },
+  { month: 'Mar', 'S24 Ultra': 78, 'A54': 91, 'M34': 87, 'Z Fold4': 71 },
+  { month: 'Apr', 'S24 Ultra': 85, 'A54': 94, 'M34': 89, 'Z Fold4': 76 },
 ];
 
-const modelComplexityData = [
-  { model: 'S24 Ultra', complexity: 85, avgTime: 4.2 },
-  { model: 'S24', complexity: 65, avgTime: 3.1 },
-  { model: 'Z Fold5', complexity: 95, avgTime: 5.8 },
-  { model: 'Z Flip5', complexity: 90, avgTime: 5.2 },
-  { model: 'A54', complexity: 45, avgTime: 1.8 },
-  { model: 'M34', complexity: 35, avgTime: 1.2 }
+const partnerPerformanceData = [
+  { id: 'P-404', name: 'Northwest Hub', city: 'SEA', region: 'West', tier: 'Gold', ftfr: 85, avgResTime: 2.4, delayedCases: 6, slaCompliance: 91, trend: 'up', repairs: 78 },
+  { id: 'P-142', name: 'Central Hub', city: 'CHI', region: 'Midwest', tier: 'Platinum', ftfr: 82, avgResTime: 2.1, delayedCases: 5, slaCompliance: 96, trend: 'up', repairs: 112 },
+  { id: 'P-045', name: 'Northeast Hub', city: 'NY', region: 'Northeast', tier: 'Gold', ftfr: 79, avgResTime: 2.8, delayedCases: 8, slaCompliance: 94, trend: 'up', repairs: 145 },
+  { id: 'P-210', name: 'South Hub', city: 'DAL', region: 'South', tier: 'Gold', ftfr: 75, avgResTime: 3.5, delayedCases: 10, slaCompliance: 89, trend: 'up', repairs: 98 },
+  { id: 'P-092', name: 'West Coast Hub', city: 'LA', region: 'West', tier: 'Platinum', ftfr: 71, avgResTime: 3.2, delayedCases: 11, slaCompliance: 88, trend: 'down', repairs: 132 },
+  { id: 'P-187', name: 'Suburban Hub', city: 'NAP', region: 'Midwest', tier: 'Silver', ftfr: 65, avgResTime: 4.1, delayedCases: 14, slaCompliance: 82, trend: 'down', repairs: 88 },
+  { id: 'P-301', name: 'Southeast Hub', city: 'MIA', region: 'South', tier: 'Silver', ftfr: 58, avgResTime: 4.8, delayedCases: 18, slaCompliance: 72, trend: 'down', repairs: 65 },
 ];
 
-const requestHeatmapData = [
-  { day: 'Mon', morning: 12, afternoon: 24, evening: 18 },
-  { day: 'Tue', morning: 15, afternoon: 28, evening: 22 },
-  { day: 'Wed', morning: 18, afternoon: 35, evening: 25 },
-  { day: 'Thu', morning: 22, afternoon: 42, evening: 30 },
-  { day: 'Fri', morning: 25, afternoon: 48, evening: 15 },
-  { day: 'Sat', morning: 35, afternoon: 52, evening: 12 },
-  { day: 'Sun', morning: 10, afternoon: 15, evening: 8 }
+const rcaDelayData = [
+  { cause: 'Part Stockout', count: 31, color: '#EF4444', cumPct: 44, action: 'Raise safety stock for PT01/PT10 at CHI-142 and MIA-301' },
+  { cause: 'Wrong Routing', count: 18, color: '#F59E0B', cumPct: 70, action: 'Enable AI-driven partner selection at triage stage' },
+  { cause: 'Tech Unavailable', count: 12, color: '#6366F1', cumPct: 87, action: 'Expand technician coverage on weekends and peak hours' },
+  { cause: 'Customer No-Show', count: 6, color: '#8B5CF6', cumPct: 95, action: 'Enforce SMS pre-confirmation 2 hours before appointment' },
+  { cause: 'Admin Error', count: 3, color: '#9CA3AF', cumPct: 100, action: 'Standardize intake form validation rules' },
+];
+
+const delayBucketData = [
+  { name: 'Screen Stockout', value: 22, color: '#EF4444' },
+  { name: 'Battery Stockout', value: 9, color: '#F97316' },
+  { name: 'Wrong Routing', value: 18, color: '#F59E0B' },
+  { name: 'Tech Unavailable', value: 12, color: '#6366F1' },
+  { name: 'Customer Delays', value: 9, color: '#9CA3AF' },
+];
+
+const hotspotData = [
+  { id: 'P-301', name: 'Southeast Hub (MIA)', region: 'South', avgResTime: 4.8, repeatRate: 24, slaBreach: 28, score: 91, level: 'critical' },
+  { id: 'P-187', name: 'Suburban Hub (NAP)', region: 'Midwest', avgResTime: 4.1, repeatRate: 18, slaBreach: 18, score: 74, level: 'high' },
+  { id: 'P-092', name: 'West Coast Hub (LA)', region: 'West', avgResTime: 3.2, repeatRate: 12, slaBreach: 12, score: 58, level: 'medium' },
+  { id: 'P-210', name: 'South Hub (DAL)', region: 'South', avgResTime: 3.5, repeatRate: 10, slaBreach: 11, score: 52, level: 'medium' },
+  { id: 'P-045', name: 'Northeast Hub (NY)', region: 'Northeast', avgResTime: 2.8, repeatRate: 8, slaBreach: 6, score: 34, level: 'low' },
+  { id: 'P-404', name: 'Northwest Hub (SEA)', region: 'West', avgResTime: 2.4, repeatRate: 6, slaBreach: 9, score: 28, level: 'low' },
+  { id: 'P-142', name: 'Central Hub (CHI)', region: 'Midwest', avgResTime: 2.1, repeatRate: 4, slaBreach: 4, score: 18, level: 'low' },
+];
+
+const actionableInsightsData = [
+  { color: 'red', icon: AlertTriangle, title: 'PT01 Stockout Risk — CHI-142', desc: 'S24U OLED at Central Hub is 4 days from critical stockout (3 units left, avg demand 1.8/day). Auto-reorder of 20 units recommended.', action: 'Trigger Reorder' },
+  { color: 'amber', icon: AlertCircle, title: 'Overload: Laura M. at 98% Load', desc: 'Technician has 9 active + 3 escalated cases. SLA breach risk is high within 4 hours. Redistribute 3 pending cases now.', action: 'Redistribute Cases' },
+  { color: 'emerald', icon: TrendingUp, title: 'PT10 Demand Wave — NY-045', desc: 'Installed base analysis projects +22% A54 battery demand at NYC cluster in 8–12 days. Pre-stage 22 units to prevent stockout.', action: 'Pre-Stage Stock' },
+  { color: 'indigo', icon: Star, title: 'FTFR Up +4pp Week-on-Week', desc: 'FTFR improved 87% → 91% this week. Primary driver: Z Fold4 screen protector (PT35) stock alignment across 3 partner stores.', action: 'View Report' },
 ];
 
 const techLoadData = [
-  { tech: 'Marcus T.', active: 8, load: 92 },
-  { tech: 'Priya S.', active: 12, load: 78 },
-  { tech: 'James R.', active: 6, load: 85 },
-  { tech: 'Laura M.', active: 9, load: 65 },
-  { tech: 'Raj P.', active: 4, load: 45 },
-  { tech: 'Elena V.', active: 7, load: 72 }
+  { tech: 'Marcus T.', active: 8, load: 92, store: 'CHI-142' },
+  { tech: 'Priya S.', active: 12, load: 78, store: 'NY-045' },
+  { tech: 'James R.', active: 6, load: 85, store: 'LA-092' },
+  { tech: 'Laura M.', active: 9, load: 98, store: 'NAP-187' },
+  { tech: 'Raj P.', active: 4, load: 45, store: 'DAL-210' },
+  { tech: 'Elena V.', active: 7, load: 72, store: 'MIA-301' },
 ];
 
-const topOutliers = [
-  { id: 'REQ-X920', device: 'Z Fold5', resolution: '18.4h', reason: 'Adhesive Failure (Retry)' },
-  { id: 'REQ-B221', device: 'S24 Ultra', resolution: '12.2h', reason: 'Substrate Cleaning Delay' },
-  { id: 'REQ-C881', device: 'Z Flip5', resolution: '11.5h', reason: 'Cable Rerouting Issue' }
+// ─── DEMAND PLANNING DATA ─────────────────────────────────────────────────────
+const installedBaseForecast = [
+  { month: 'Jan', 'S24 Ultra': 820, 'A54': 1140, 'M34': 980, 'Z Fold4': 340 },
+  { month: 'Feb', 'S24 Ultra': 845, 'A54': 1180, 'M34': 1010, 'Z Fold4': 360 },
+  { month: 'Mar', 'S24 Ultra': 870, 'A54': 1220, 'M34': 1040, 'Z Fold4': 375 },
+  { month: 'Apr', 'S24 Ultra': 892, 'A54': 1265, 'M34': 1070, 'Z Fold4': 390 },
+  { month: 'May', 'S24 Ultra': 918, 'A54': 1305, 'M34': 1090, 'Z Fold4': 412, isForecast: true },
+  { month: 'Jun', 'S24 Ultra': 940, 'A54': 1348, 'M34': 1108, 'Z Fold4': 428, isForecast: true },
+  { month: 'Jul', 'S24 Ultra': 958, 'A54': 1388, 'M34': 1122, 'Z Fold4': 446, isForecast: true },
+  { month: 'Aug', 'S24 Ultra': 975, 'A54': 1420, 'M34': 1135, 'Z Fold4': 462, isForecast: true },
+  { month: 'Sep', 'S24 Ultra': 990, 'A54': 1455, 'M34': 1148, 'Z Fold4': 480, isForecast: true },
+  { month: 'Oct', 'S24 Ultra': 1008, 'A54': 1492, 'M34': 1158, 'Z Fold4': 498, isForecast: true },
+  { month: 'Nov', 'S24 Ultra': 1022, 'A54': 1528, 'M34': 1168, 'Z Fold4': 515, isForecast: true },
+  { month: 'Dec', 'S24 Ultra': 1040, 'A54': 1568, 'M34': 1180, 'Z Fold4': 532, isForecast: true },
 ];
 
-const resolutionEfficiency = [
-  { week: 'W1', value: 68 },
-  { week: 'W2', value: 72 },
-  { week: 'W3', value: 75 },
-  { week: 'W4', value: 82 },
-  { week: 'W5', value: 91 }
+const repairDemandForecast = [
+  { month: 'Apr', screen: 42, battery: 35, port: 18, protector: 12 },
+  { month: 'May', screen: 45, battery: 38, port: 20, protector: 14 },
+  { month: 'Jun', screen: 49, battery: 42, port: 22, protector: 15 },
+  { month: 'Jul', screen: 53, battery: 46, port: 24, protector: 17 },
+  { month: 'Aug', screen: 57, battery: 50, port: 26, protector: 19 },
+  { month: 'Sep', screen: 61, battery: 54, port: 28, protector: 21 },
+  { month: 'Oct', screen: 66, battery: 58, port: 30, protector: 23 },
+  { month: 'Nov', screen: 70, battery: 62, port: 32, protector: 25 },
+  { month: 'Dec', screen: 74, battery: 67, port: 34, protector: 27 },
 ];
 
-const weeklyVolumeData = [
-  { week: 'Wk 1 (Mar 10)', requests: 34, resolved: 28, ftfr: 82, backlog: 6 },
-  { week: 'Wk 2 (Mar 17)', requests: 41, resolved: 35, ftfr: 85, backlog: 12 },
-  { week: 'Wk 3 (Mar 24)', requests: 38, resolved: 33, ftfr: 87, backlog: 17 },
-  { week: 'Wk 4 (Mar 31)', requests: 52, resolved: 44, ftfr: 84, backlog: 25 },
-  { week: 'Wk 5 (Apr 7)', requests: 47, resolved: 43, ftfr: 91, backlog: 29 },
-];
-
-// NEW: SKU Specific Trends
-const partTrendData = {
-  'PT01': [
-    { date: 'Apr 01', demand: 12, arrival: 10, gap: 2 },
-    { date: 'Apr 02', demand: 15, arrival: 12, gap: 3 },
-    { date: 'Apr 03', demand: 8, arrival: 15, gap: -7 },
-    { date: 'Apr 04', demand: 22, arrival: 14, gap: 8 },
-    { date: 'Apr 05', demand: 18, arrival: 18, gap: 0 },
-  ],
-  'PT10': [
-    { date: 'Apr 01', demand: 5, arrival: 8, gap: -3 },
-    { date: 'Apr 02', demand: 7, arrival: 6, gap: 1 },
-    { date: 'Apr 03', demand: 12, arrival: 10, gap: 2 },
-    { date: 'Apr 04', demand: 15, arrival: 12, gap: 3 },
-    { date: 'Apr 05', demand: 9, arrival: 15, gap: -6 },
-  ]
-};
-
-const resolutionTimeData = [
-  { week: 'W1', avgHours: 3.8 },
-  { week: 'W2', avgHours: 3.4 },
-  { week: 'W3', avgHours: 3.1 },
-  { week: 'W4', avgHours: 2.9 },
-  { week: 'W5', avgHours: 2.4 },
-];
-
-// NEW: RCA Data - Failure Drivers (Pareto)
-const rootCauseData = [
-  { cause: 'Physical Impact (Drops)', count: 42, color: '#6366F1', percentage: 45 },
-  { cause: 'Thermal Stress (Battery)', count: 18, color: '#10B981', percentage: 65 },
-  { cause: 'Moisture ingress', count: 12, color: '#F59E0B', percentage: 78 },
-  { cause: 'Connector Fatigue', count: 8, color: '#EF4444', percentage: 90 },
-  { cause: 'Firmware/Logic', count: 5, color: '#9CA3AF', percentage: 100 },
-];
-
-// NEW: Device Stress Radar
-const stressVectorData = [
-  { subject: 'Impact Res.', A: 120, B: 110, fullMark: 150 },
-  { subject: 'Thermal Sol.', A: 98, B: 130, fullMark: 150 },
-  { subject: 'Water Res.', A: 86, B: 130, fullMark: 150 },
-  { subject: 'Adhesion', A: 99, B: 100, fullMark: 150 },
-  { subject: 'Cycle Life', A: 85, B: 90, fullMark: 150 },
-];
-
-// NEW: SLA Performance Heatmap (Mocked)
-const slaStorePerformance = [
-  { store: 'NY-045', slaRate: 94, load: 82 },
-  { store: 'LA-092', slaRate: 88, load: 95 },
-  { store: 'CHI-142', slaRate: 96, load: 74 },
-  { store: 'DAL-210', slaRate: 91, load: 68 },
-  { store: 'MIA-301', slaRate: 72, load: 99 },
+const partDemandMatrix = [
+  { part: 'PT01 — S24U OLED', May: 14, Jun: 16, Jul: 18, Aug: 20, Sep: 22, peakPartner: 'CHI-142', risk: 'High' },
+  { part: 'PT10 — A54 Battery', May: 22, Jun: 25, Jul: 28, Aug: 31, Sep: 34, peakPartner: 'NY-045', risk: 'Medium' },
+  { part: 'PT08 — S24 Charging Port', May: 9, Jun: 10, Jul: 11, Aug: 12, Sep: 13, peakPartner: 'LA-092', risk: 'Low' },
+  { part: 'PT34 — M34 AMOLED', May: 7, Jun: 8, Jul: 9, Aug: 10, Sep: 11, peakPartner: 'MIA-301', risk: 'Medium' },
+  { part: 'PT35 — Z Fold4 Protector', May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, peakPartner: 'SEA-404', risk: 'Low' },
 ];
 
 // ─── CUSTOM TOOLTIP ───────────────────────────────────────────────────────────
@@ -220,10 +206,11 @@ export default function ReservationQueue({ model }) {
   const [reqFilter, setReqFilter] = useState('All');
   const [activeReqId, setActiveReqId] = useState(liveRequests[model][0].id);
   const [toastMessage, setToastMessage] = useState(null);
-  const [contextOpen, setContextOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [historyFilter, setHistoryFilter] = useState('All');
-  const [selectedAnalyicsPart, setSelectedAnalyticsPart] = useState('PT01');
+  const [perfModelFilter, setPerfModelFilter] = useState('All');
+  const [perfPartnerFilter, setPerfPartnerFilter] = useState('All Partners');
+  const [contextOpen, setContextOpen] = useState(false);
 
   const isToBe = model === 'TO_BE';
   const qStats = oemMetrics[model].queueStats;
@@ -267,9 +254,9 @@ export default function ReservationQueue({ model }) {
             <div className="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200">
               <Inbox className="text-white" size={20} />
             </div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Requests Hub <span className="text-indigo-600">Control</span></h2>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Repair Reservation <span className="text-indigo-600">Hub</span></h2>
           </div>
-          <p className="text-sm font-semibold text-gray-400 ml-12">Live triage of incoming service requests with full lifecycle tracking.</p>
+          <p className="text-sm font-semibold text-gray-400 ml-12">End-to-end repair lifecycle management · Performance intelligence · Demand planning.</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm">
@@ -313,7 +300,8 @@ export default function ReservationQueue({ model }) {
         {[
           { id: 'live', label: 'Live Queue', icon: Inbox },
           { id: 'history', label: 'Request History', icon: History },
-          { id: 'analytics', label: 'Analytics & EDA', icon: BarChart3 },
+          { id: 'performance', label: 'Repair Performance Mgt', icon: BarChart3 },
+          ...(isToBe ? [{ id: 'planning', label: 'Demand Planning', icon: Layers }] : []),
         ].map(tab => (
           <button
             key={tab.id}
@@ -560,289 +548,437 @@ export default function ReservationQueue({ model }) {
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════
-          TAB: ANALYTICS
-      ═══════════════════════════════════════════════════ */}
-      {activeTab === 'analytics' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-          {/* ROW 1: Network Pulse (Wide) */}
-          <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Network Pulse —</h4>
-                <p className="text-lg font-black text-gray-900 leading-tight pr-4">Global Request Velocity & Backlog Accumulation</p>
-              </div>
-              <div className="flex items-center gap-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">
-                <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-indigo-600"/> Velocity</span>
-                <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500"/> Resolved</span>
-                <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-400"/> Backlog Delta</span>
-                <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm border-2 border-amber-400 border-dashed bg-white"/> FTFR %</span>
-              </div>
+      {/* ═══════════ TAB: REPAIR PERFORMANCE MGT ═══════════ */}
+      {activeTab === 'performance' && (
+        <div className="space-y-5">
+
+          {/* GLOBAL FILTER BAR */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2">
+              <Filter size={13} className="text-indigo-600" /> Global Filters
             </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={weeklyVolumeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorReq" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorBack" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB"/>
-                <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 700 }} dy={10}/>
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} dx={-10}/>
-                <Tooltip content={<ChartTooltip />}/>
-                <Area type="monotone" dataKey="requests" stroke="#6366F1" strokeWidth={4} fill="url(#colorReq)" name="Velocity" dot={{ r: 4, fill: '#6366F1', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }}/>
-                <Area type="monotone" dataKey="resolved" stroke="#10B981" strokeWidth={4} fill="url(#colorRes)" name="Resolved" dot={{ r: 4, fill: '#10B981', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }}/>
-                <Area type="monotone" dataKey="backlog" stroke="#EF4444" strokeWidth={2} fill="url(#colorBack)" name="Backlog Delta" strokeDasharray="4 4" />
-                <Line type="monotone" dataKey="ftfr" stroke="#F59E0B" strokeWidth={2} strokeDasharray="6 4" dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#F59E0B' }} name="FTFR" />
-              </AreaChart>
-            </ResponsiveContainer>
-            <div className="mt-4 flex gap-6">
-              <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl flex-1">
-                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Weekly Volume Trend</p>
-                <p className="text-sm font-black text-indigo-900">+12% Peak Demand Increase in Wk 4</p>
-              </div>
-              <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-xl flex-1">
-                <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Efficiency Delta</p>
-                <p className="text-sm font-black text-emerald-900">91% Resolution rate achieved in Current Wk</p>
-              </div>
-              <div className="bg-red-50 border border-red-100 p-3 rounded-xl flex-1">
-                <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Backlog Warning</p>
-                <p className="text-sm font-black text-red-900">Critical backlog growth in Central Hub (#142)</p>
-              </div>
+            {['All', 'S24 Ultra', 'A54', 'M34', 'Z Fold4'].map(m => (
+              <button key={m} onClick={() => setPerfModelFilter(m)}
+                className={`px-3 py-1.5 text-[10px] font-black rounded-lg border transition-all ${perfModelFilter === m ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>{m}</button>
+            ))}
+            <div className="w-px h-5 bg-gray-200 mx-1" />
+            {['All Partners', 'CHI-142', 'NY-045', 'LA-092', 'MIA-301', 'NAP-187'].map(p => (
+              <button key={p} onClick={() => setPerfPartnerFilter(p)}
+                className={`px-3 py-1.5 text-[10px] font-black rounded-lg border transition-all ${perfPartnerFilter === p ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>{p}</button>
+            ))}
+            <div className="ml-auto text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+              Scope: Apr 2026 · {perfPartnerFilter} · {perfModelFilter}
             </div>
           </div>
 
-          {/* ROW 2: Distributions */}
-
-          {/* Regional Load */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col">
-            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Geographic EDA —</h4>
-            <p className="text-base font-black text-gray-900 mb-6">Regional Request Distribution</p>
-            <div className="flex-1">
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={regionalDistributionData} layout="vertical" margin={{ left: -10, right: 30 }}>
-                  <XAxis type="number" hide />
-                  <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#4B5563', fontWeight: 800 }} width={80}/>
-                  <Tooltip content={<ChartTooltip />}/>
-                  <Bar dataKey="requests" radius={[0, 6, 6, 0]} barSize={20}>
-                    {regionalDistributionData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+          {/* PERFORMANCE KPIs */}
+          <div className="grid grid-cols-5 gap-4">
+            {[
+              { label: 'Total Repairs MTD', value: '419', sub: 'Jan–Apr 2026', trend: '+14%', color: 'indigo', icon: Wrench },
+              { label: 'FTFR Rate', value: '87%', sub: 'vs 83% Jan baseline', trend: '+4pp', color: 'emerald', icon: CheckCircle2 },
+              { label: 'Avg Resolution', value: '2.8h', sub: 'down from 3.8h Jan', trend: '-28%', color: 'blue', icon: Clock },
+              { label: 'Repeat Repair Rate', value: '8.2%', sub: 'returned cases', trend: '-2.1pp', color: 'amber', icon: RefreshCw },
+              { label: 'Delayed Repairs', value: '70', sub: 'of 419 total cases', trend: '-12%', color: 'red', icon: AlertTriangle },
+            ].map((kpi, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:border-indigo-200 transition-all">
+                <div className="flex justify-between items-start mb-3">
+                  <div className={`p-2 rounded-xl bg-${kpi.color}-50`}>
+                    <kpi.icon size={15} className={`text-${kpi.color}-600`} />
+                  </div>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">{kpi.trend}</span>
+                </div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{kpi.label}</p>
+                <p className="text-2xl font-black text-gray-900 mb-0.5">{kpi.value}</p>
+                <p className="text-[9px] text-gray-400 font-semibold">{kpi.sub}</p>
+              </div>
+            ))}
           </div>
 
-          {/* ROW 2: Root Cause & Stress Profiling */}
-          
-          {/* RCA: Failure Drivers (Pareto) */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Root Cause —</h4>
-                <p className="text-base font-black text-gray-900 leading-tight">Pareto: Top Failure Drivers</p>
+          {/* HISTORICAL TRENDS + FTFR BY MODEL */}
+          <div className="grid grid-cols-3 gap-5">
+            <div className="col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <div className="flex justify-between items-start mb-5">
+                <div>
+                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Historical Performance —</h4>
+                  <p className="text-base font-black text-gray-900">Monthly Repair Volume & Resolution Trends</p>
+                </div>
+                <div className="flex gap-3 text-[9px] font-black text-gray-400 uppercase">
+                  {[['#6366F1','Volume'],['#10B981','Resolved'],['#F97316','Escalated'],['#F59E0B','FTFR %']].map(([c,l]) => (
+                    <span key={l} className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{background:c}}/>{l}</span>
+                  ))}
+                </div>
               </div>
-              <span className="px-2 py-1 bg-indigo-50 text-indigo-700 text-[9px] font-black rounded-lg border border-indigo-100 uppercase">Analysis: P82</span>
-            </div>
-            <div className="flex-1">
               <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={rootCauseData}>
+                <ComposedChart data={historicalRepairData} margin={{ top: 5, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                  <XAxis dataKey="cause" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#9CA3AF', fontWeight: 800 }} interval={0} angle={-20} textAnchor="end" height={50} />
-                  <YAxis yAxisId="left" orientation="left" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
-                  <Tooltip content={<ChartTooltip />}/>
-                  <Bar yAxisId="left" dataKey="count" radius={[4, 4, 0, 0]} barSize={32}>
-                    {rootCauseData.map((entry, index) => <Cell key={index} fill={entry.color} fillOpacity={0.8} />)}
-                  </Bar>
-                  <Line yAxisId="right" type="monotone" dataKey="percentage" stroke="#4F46E5" strokeWidth={3} dot={{ r: 4, fill: '#4F46E5', strokeWidth: 2, stroke: '#fff' }} name="Cumulative %" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[60, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                  <Bar yAxisId="left" dataKey="volume" fill="#6366F1" fillOpacity={0.85} radius={[4,4,0,0]} barSize={28} name="Volume" />
+                  <Bar yAxisId="left" dataKey="resolved" fill="#10B981" fillOpacity={0.85} radius={[4,4,0,0]} barSize={28} name="Resolved" />
+                  <Bar yAxisId="left" dataKey="escalated" fill="#F97316" fillOpacity={0.85} radius={[4,4,0,0]} barSize={16} name="Escalated" />
+                  <Line yAxisId="right" type="monotone" dataKey="ftfr" stroke="#F59E0B" strokeWidth={3} dot={{ r: 5, fill: '#F59E0B', stroke: '#fff', strokeWidth: 2 }} name="FTFR %" />
                 </ComposedChart>
               </ResponsiveContainer>
-              <div className="mt-4 p-3 bg-gray-50 border border-gray-100 rounded-xl">
-                <p className="text-[10px] font-bold text-gray-500 leading-relaxed italic"><span className="text-indigo-600 font-black">AI Insight:</span> Physical Impact remains the #1 driver for S24U. 82% of screened cases show secondary hinge stress clusters.</p>
+              <div className="mt-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                <p className="text-[10px] font-bold text-indigo-800 leading-relaxed"><span className="font-black">AI Insight:</span> FTFR improved +8pp (Jan→Apr). Primary driver: CHI-142 stock realignment driven by MTBF predictions cut escalations from 12 to 2 cases/month.</p>
               </div>
             </div>
-          </div>
 
-          {/* Stress Vector Radar */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col">
-            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Diagnostic Profiling —</h4>
-            <p className="text-base font-black text-gray-900 mb-6">Device Stress Vectors (Reliability)</p>
-            <div className="flex-1 mt-4">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Model Cut —</h4>
+              <p className="text-base font-black text-gray-900 mb-5">FTFR % by Device Family</p>
               <ResponsiveContainer width="100%" height={220}>
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={stressVectorData}>
-                  <PolarGrid stroke="#E5E7EB" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 8, fontWeights: 900, fill: '#9CA3AF' }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
-                  <Radar name="AS-IS Avg" dataKey="A" stroke="#EF4444" fill="#EF4444" fillOpacity={0.1} />
-                  <Radar name="Target SLA" dataKey="B" stroke="#6366F1" fill="#6366F1" fillOpacity={0.2} />
-                  <Tooltip content={<ChartTooltip />}/>
-                </RadarChart>
+                <LineChart data={ftfrByModelData} margin={{ top: 5, right: 15, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[55, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                  <Line type="monotone" dataKey="S24 Ultra" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 4, fill: '#6366F1', stroke: '#fff', strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="A54" stroke="#10B981" strokeWidth={2.5} dot={{ r: 4, fill: '#10B981', stroke: '#fff', strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="M34" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 4, fill: '#F59E0B', stroke: '#fff', strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="Z Fold4" stroke="#8B5CF6" strokeWidth={2.5} dot={{ r: 4, fill: '#8B5CF6', stroke: '#fff', strokeWidth: 2 }} />
+                </LineChart>
               </ResponsiveContainer>
-              <div className="flex justify-center gap-4 mt-2">
-                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-400"/> <span className="text-[10px] font-black text-gray-400">Current</span></div>
-                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-600"/> <span className="text-[10px] font-black text-gray-400">Bench: S24U</span></div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {[['#6366F1','S24 Ultra'],['#10B981','A54'],['#F59E0B','M34'],['#8B5CF6','Z Fold4']].map(([c,l]) => (
+                  <span key={l} className="flex items-center gap-1 text-[9px] font-black text-gray-500"><span className="w-2 h-2 rounded-full" style={{background:c}}/>{l}</span>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* SLA Performance Grid (Heatmap Style) */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col">
-            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Performance Heatmap —</h4>
-            <p className="text-base font-black text-gray-900 mb-6">SLA Fix-Rate by Node Load</p>
-            <div className="space-y-3.5 flex-1 justify-center flex flex-col">
-              {slaStorePerformance.map((item, i) => (
-                <div key={i} className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center text-[10px] font-black tracking-widest text-gray-400 uppercase">
-                    <span>{item.store}</span>
-                    <span className={item.slaRate > 90 ? 'text-emerald-500' : item.slaRate > 80 ? 'text-amber-500' : 'text-red-500'}>{item.slaRate}% SLA</span>
+          {/* HOTSPOT + RCA */}
+          <div className="grid grid-cols-2 gap-5">
+            {/* Hotspot Table */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <div className="flex justify-between items-start mb-5">
+                <div>
+                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Hotspot Identification —</h4>
+                  <p className="text-base font-black text-gray-900">Partner Delay Risk Ranking</p>
+                </div>
+                <span className="px-2 py-1 bg-red-50 text-red-600 text-[9px] font-black rounded-lg border border-red-100 uppercase">2 Critical</span>
+              </div>
+              <div className="rounded-xl overflow-hidden border border-gray-100">
+                <table className="w-full text-xs">
+                  <thead className="bg-gray-50 border-b border-gray-100">
+                    <tr>{['Partner','Region','Avg Res.','Repeat%','SLA Breach','Score'].map(h=>(
+                      <th key={h} className="px-3 py-2 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">{h}</th>
+                    ))}</tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {hotspotData.map((h, i) => (
+                      <tr key={i} className={`hover:bg-gray-50 transition-colors ${h.level==='critical'?'bg-red-50/40':h.level==='high'?'bg-amber-50/30':''}`}>
+                        <td className="px-3 py-2.5 font-bold text-gray-800 flex items-center gap-1.5">
+                          {h.level==='critical'&&<span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"/>}
+                          {h.level==='high'&&<span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"/>}
+                          {h.level==='low'&&<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"/>}
+                          <span className="truncate max-w-[110px]">{h.name}</span>
+                        </td>
+                        <td className="px-3 py-2.5 text-gray-500 font-semibold">{h.region}</td>
+                        <td className="px-3 py-2.5 font-black text-gray-800">{h.avgResTime}h</td>
+                        <td className="px-3 py-2.5 font-bold text-gray-700">{h.repeatRate}%</td>
+                        <td className="px-3 py-2.5 font-bold text-gray-700">{h.slaBreach}%</td>
+                        <td className="px-3 py-2.5">
+                          <span className={`font-black text-[10px] px-2 py-0.5 rounded-full ${h.score>70?'bg-red-100 text-red-700':h.score>45?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700'}`}>{h.score}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Automated RCA */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <div className="flex justify-between items-start mb-5">
+                <div>
+                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Automated RCA —</h4>
+                  <p className="text-base font-black text-gray-900">Time Delay Root Cause Pareto</p>
+                </div>
+                <span className="px-2 py-1 bg-indigo-50 text-indigo-700 text-[9px] font-black rounded-lg border border-indigo-100 uppercase">P80 Rule</span>
+              </div>
+              <ResponsiveContainer width="100%" height={200}>
+                <ComposedChart data={rcaDelayData} margin={{ top: 5, right: 30, left: 0, bottom: 30 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="cause" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#9CA3AF', fontWeight: 700 }} interval={0} angle={-15} textAnchor="end" height={45} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[0, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                  <Bar yAxisId="left" dataKey="count" radius={[4,4,0,0]} barSize={36} name="Case Count">
+                    {rcaDelayData.map((e,i) => <Cell key={i} fill={e.color} fillOpacity={0.85} />)}
+                  </Bar>
+                  <Line yAxisId="right" type="monotone" dataKey="cumPct" stroke="#4F46E5" strokeWidth={3} dot={{ r: 4, fill: '#4F46E5', stroke: '#fff', strokeWidth: 2 }} name="Cumulative %" />
+                  <ReferenceLine yAxisId="right" y={80} stroke="#4F46E5" strokeDasharray="4 4" strokeWidth={1.5} />
+                </ComposedChart>
+              </ResponsiveContainer>
+              <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-xl">
+                <p className="text-[10px] font-bold text-red-800 leading-relaxed"><span className="font-black">AI RCA:</span> 70% of delays are driven by Part Stockout + Wrong Routing. CHI-142 accounts for 42% of stockout-delay cases. Recommend safety stock uplift + AI triage routing.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* DELAY PIE + ACTIONABLE INSIGHTS */}
+          <div className="grid grid-cols-3 gap-5">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Delay Analysis —</h4>
+              <p className="text-base font-black text-gray-900 mb-4">Delayed Repairs by Root Bucket</p>
+              <ResponsiveContainer width="100%" height={190}>
+                <PieChart>
+                  <Pie data={delayBucketData} cx="50%" cy="50%" innerRadius={48} outerRadius={78} paddingAngle={3} dataKey="value">
+                    {delayBucketData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-1.5 mt-3">
+                {delayBucketData.map((d, i) => (
+                  <div key={i} className="flex items-center justify-between text-[10px]">
+                    <span className="flex items-center gap-1.5 font-semibold text-gray-600"><span className="w-2 h-2 rounded-full" style={{background:d.color}}/>{d.name}</span>
+                    <span className="font-black text-gray-800">{d.value} cases</span>
                   </div>
-                  <div className="h-5 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative group cursor-help">
-                    <div className={`h-full transition-all duration-1000 ${
-                      item.slaRate > 90 ? 'bg-emerald-500/80' : item.slaRate > 80 ? 'bg-amber-400/80' : 'bg-red-500/80'
-                    }`} style={{ width: `${item.slaRate}%` }} />
-                    <div className="absolute inset-0 flex items-center justify-end px-3">
-                       <span className="text-[9px] font-black text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">LOAD: {item.load}%</span>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <p className="text-[10px] font-bold text-gray-500">Screen + Battery stockouts = <span className="text-red-600 font-black">44%</span> of all delays this period.</p>
+              </div>
+            </div>
+
+            <div className="col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Actionable Insights —</h4>
+              <p className="text-base font-black text-gray-900 mb-4">System-Generated Recommendations</p>
+              <div className="grid grid-cols-2 gap-3">
+                {actionableInsightsData.map((ins, i) => (
+                  <div key={i} className={`bg-${ins.color}-50 border border-${ins.color}-200 rounded-xl p-4`}>
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className={`p-1.5 rounded-lg bg-${ins.color}-100`}>
+                        <ins.icon size={13} className={`text-${ins.color}-600`} />
+                      </div>
+                      <p className={`text-[11px] font-black text-${ins.color}-900 leading-tight flex-1`}>{ins.title}</p>
+                    </div>
+                    <p className={`text-[10px] font-semibold text-${ins.color}-700 leading-relaxed mb-3`}>{ins.desc}</p>
+                    <button className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-${ins.color}-600 text-white hover:opacity-90 transition-opacity shadow-sm`}>{ins.action} →</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* PARTNER PERFORMANCE TABLE */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Partner Performance Mgt —</h4>
+                <p className="text-base font-black text-gray-900">Top / Bottom Performing Partners</p>
+              </div>
+              <div className="flex items-center gap-3 text-[9px] font-black text-gray-400 uppercase">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400"/>Top 3</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400"/>Bottom 2</span>
+              </div>
+            </div>
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>{['#','Partner','Region','Tier','FTFR%','Avg Res. Time','Delayed','SLA Comp.','Trend','Repairs MTD'].map(h => (
+                  <th key={h} className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {partnerPerformanceData.map((p, i) => {
+                  const isTop = i < 3;
+                  const isBot = i >= partnerPerformanceData.length - 2;
+                  return (
+                    <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${isTop ? 'bg-emerald-50/30' : isBot ? 'bg-red-50/30' : ''}`}>
+                      <td className="px-4 py-3">
+                        {isTop ? <Award size={14} className="text-emerald-500" /> : isBot ? <AlertCircle size={14} className="text-red-400" /> : <span className="text-gray-400 font-bold text-xs">{i+1}</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-black text-gray-900">{p.name}</div>
+                        <div className="text-[9px] text-gray-400 font-semibold">{p.id} · {p.city}</div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600 font-semibold">{p.region}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${p.tier==='Platinum'?'bg-purple-100 text-purple-700':p.tier==='Gold'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-600'}`}>{p.tier}</span>
+                      </td>
+                      <td className="px-4 py-3 font-black text-gray-900">{p.ftfr}%</td>
+                      <td className="px-4 py-3 font-bold text-gray-700">{p.avgResTime}h</td>
+                      <td className="px-4 py-3 font-bold text-gray-700">{p.delayedCases}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden w-16">
+                            <div className={`h-full rounded-full ${p.slaCompliance>90?'bg-emerald-500':p.slaCompliance>80?'bg-amber-400':'bg-red-500'}`} style={{width:`${p.slaCompliance}%`}} />
+                          </div>
+                          <span className="font-black text-[10px] text-gray-700">{p.slaCompliance}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {p.trend==='up' ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-red-400" />}
+                      </td>
+                      <td className="px-4 py-3 font-black text-indigo-700">{p.repairs}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* TECHNICIAN LOAD */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Human Capital —</h4>
+            <p className="text-base font-black text-gray-900 mb-5">Technician Load & Active Cases</p>
+            <div className="grid grid-cols-3 gap-4">
+              {techLoadData.map((t, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <User size={14} className="text-indigo-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[11px] font-black text-gray-800 truncate">{t.tech}</span>
+                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${t.load>90?'bg-red-100 text-red-700':'bg-indigo-100 text-indigo-700'}`}>{t.active} ACT</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${t.load>90?'bg-red-500':t.load>75?'bg-amber-400':'bg-indigo-500'}`} style={{width:`${t.load}%`}} />
+                    </div>
+                    <div className="flex justify-between mt-0.5">
+                      <span className="text-[9px] text-gray-400 font-semibold">{t.store}</span>
+                      <span className={`text-[9px] font-black ${t.load>90?'text-red-600':t.load>75?'text-amber-600':'text-gray-500'}`}>{t.load}%</span>
                     </div>
                   </div>
                 </div>
               ))}
-              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                 <span className="text-[10px] font-black text-gray-400 flex items-center gap-1"><Zap size={10} className="text-amber-500"/> Nodes at Critical Load: 2</span>
-                 <button className="text-[10px] font-black text-indigo-600 uppercase hover:underline">Full Audit</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════ TAB: DEMAND PLANNING (TO-BE ONLY) ═══════════ */}
+      {activeTab === 'planning' && isToBe && (
+        <div className="space-y-5">
+
+          {/* SUMMARY CARDS */}
+          <div className="grid grid-cols-3 gap-5">
+            {[
+              { label: 'Peak Demand Month', value: 'Dec 2026', sub: 'A54 Battery: 67 units projected', color: 'indigo', icon: Calendar },
+              { label: 'At-Risk SKU', value: 'PT01 — S24U OLED', sub: 'CHI-142: 4-day stockout window', color: 'red', icon: AlertTriangle },
+              { label: 'Pre-Order Recommendation', value: '22 Units · PT10', sub: 'NY-045 cluster · 8-day lead time', color: 'emerald', icon: Package },
+            ].map((c, i) => (
+              <div key={i} className={`bg-${c.color}-50 border border-${c.color}-200 rounded-2xl p-6 flex items-start gap-4`}>
+                <div className={`p-3 rounded-xl bg-${c.color}-100`}>
+                  <c.icon size={20} className={`text-${c.color}-600`} />
+                </div>
+                <div>
+                  <p className={`text-[10px] font-black text-${c.color}-400 uppercase tracking-widest mb-1`}>{c.label}</p>
+                  <p className={`text-lg font-black text-${c.color}-900 mb-0.5`}>{c.value}</p>
+                  <p className={`text-[11px] font-semibold text-${c.color}-700`}>{c.sub}</p>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* INSTALLED BASE FORECAST */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <div className="flex justify-between items-start mb-5">
+              <div>
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Capabilities as Enablers —</h4>
+                <p className="text-lg font-black text-gray-900">Device Installed Base Forecast · Jan–Dec 2026</p>
+              </div>
+              <div className="flex gap-3 text-[9px] font-black text-gray-400 uppercase">
+                {[['#6366F1','S24 Ultra'],['#10B981','A54'],['#F59E0B','M34'],['#8B5CF6','Z Fold4']].map(([c,l]) => (
+                  <span key={l} className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{background:c}}/>{l}</span>
+                ))}
+                <span className="flex items-center gap-1 ml-2"><span className="inline-block w-6 border-t-2 border-dashed border-gray-400"/><span className="text-gray-400">Forecast</span></span>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={installedBaseForecast} margin={{ top: 5, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                <ReferenceLine x="Apr" stroke="#E5E7EB" strokeWidth={2} strokeDasharray="6 3" label={{ value: 'Forecast →', position: 'top', fontSize: 9, fill: '#9CA3AF', fontWeight: 700 }} />
+                <Line type="monotone" dataKey="S24 Ultra" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 3 }} strokeDasharray={(d) => d.isForecast ? '5 4' : '0'} />
+                <Line type="monotone" dataKey="A54" stroke="#10B981" strokeWidth={2.5} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="M34" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="Z Fold4" stroke="#8B5CF6" strokeWidth={2.5} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {[
+                { label: 'Largest Active Base', value: 'A54 · 1,568 units by Dec', color: 'emerald' },
+                { label: 'Fastest Growing', value: 'A54 +37% Jan→Dec', color: 'indigo' },
+                { label: 'Repair Rate At Maturity', value: '~8% of installed base/yr', color: 'amber' },
+              ].map((s,i) => (
+                <div key={i} className={`p-3 bg-${s.color}-50 border border-${s.color}-100 rounded-xl`}>
+                  <p className={`text-[9px] font-black text-${s.color}-400 uppercase mb-1`}>{s.label}</p>
+                  <p className={`text-sm font-black text-${s.color}-900`}>{s.value}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* ROW 3: Velocity & Load */}
-
-          {/* Heatmap-esque Daily Velocity */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col lg:col-span-2">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Temporal Analysis —</h4>
-                <p className="text-base font-black text-gray-900 leading-tight pr-4">Daily Demand Velocity Patterns</p>
-              </div>
-            </div>
-            <div className="flex-1">
+          {/* DEMAND FORECAST + PART MATRIX */}
+          <div className="grid grid-cols-2 gap-5">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Demand Planning —</h4>
+              <p className="text-base font-black text-gray-900 mb-5">Repair Demand Projection by Part Category (Apr–Dec)</p>
               <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={requestHeatmapData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6B7280', fontWeight: 700 }}/>
-                  <YAxis axisLine={false} tickLine={false} hide />
-                  <Tooltip content={<ChartTooltip />}/>
-                  <Area type="monotone" dataKey="morning" stackId="1" stroke="#818CF8" fill="#818CF8" fillOpacity={0.4} name="Morning" />
-                  <Area type="monotone" dataKey="afternoon" stackId="1" stroke="#6366F1" fill="#6366F1" fillOpacity={0.6} name="Afternoon" />
-                  <Area type="monotone" dataKey="evening" stackId="1" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.8} name="Evening" />
+                <AreaChart data={repairDemandForecast} margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
+                  <defs>
+                    {[['screen','#6366F1'],['battery','#10B981'],['port','#F59E0B'],['protector','#8B5CF6']].map(([k,c]) => (
+                      <linearGradient key={k} id={`grad-${k}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={c} stopOpacity={0.25}/>
+                        <stop offset="95%" stopColor={c} stopOpacity={0}/>
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                  <Area type="monotone" dataKey="screen" stroke="#6366F1" strokeWidth={2.5} fill="url(#grad-screen)" name="Screen (PT01/PT34)" />
+                  <Area type="monotone" dataKey="battery" stroke="#10B981" strokeWidth={2.5} fill="url(#grad-battery)" name="Battery (PT10/PT36)" />
+                  <Area type="monotone" dataKey="port" stroke="#F59E0B" strokeWidth={2.5} fill="url(#grad-port)" name="Charging Port (PT08)" />
+                  <Area type="monotone" dataKey="protector" stroke="#8B5CF6" strokeWidth={2.5} fill="url(#grad-protector)" name="Screen Protector (PT35)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </div>
 
-          {/* Part Intelligence Profile SKU selector */}
-          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Part Profile —</h4>
-                <p className="text-base font-black text-gray-900 leading-tight">SKU Demand vs Supply Stability</p>
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Part × Partner Matrix —</h4>
+              <p className="text-base font-black text-gray-900 mb-5">Forecasted Monthly Demand by SKU (Units)</p>
+              <div className="rounded-xl overflow-hidden border border-gray-100">
+                <table className="w-full text-xs">
+                  <thead className="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                      <th className="px-3 py-2.5 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">Part SKU</th>
+                      {['May','Jun','Jul','Aug','Sep'].map(m => (
+                        <th key={m} className="px-3 py-2.5 text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">{m}</th>
+                      ))}
+                      <th className="px-3 py-2.5 text-[9px] font-black text-gray-400 uppercase text-left">Peak Partner</th>
+                      <th className="px-3 py-2.5 text-[9px] font-black text-gray-400 uppercase text-center">Risk</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {partDemandMatrix.map((r, i) => (
+                      <tr key={i} className="hover:bg-indigo-50/20 transition-colors">
+                        <td className="px-3 py-3 font-black text-gray-800 text-[10px]">{r.part}</td>
+                        {[r.May, r.Jun, r.Jul, r.Aug, r.Sep].map((v, j) => (
+                          <td key={j} className="px-3 py-3 text-center font-bold text-gray-700">{v}</td>
+                        ))}
+                        <td className="px-3 py-3 font-semibold text-indigo-600 text-[10px]">{r.peakPartner}</td>
+                        <td className="px-3 py-3 text-center">
+                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${r.risk==='High'?'bg-red-100 text-red-700':r.risk==='Medium'?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700'}`}>{r.risk}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
-                <button 
-                  onClick={() => setSelectedAnalyticsPart('PT01')}
-                  className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${selectedAnalyicsPart === 'PT01' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >PT01 (OLED)</button>
-                <button 
-                  onClick={() => setSelectedAnalyticsPart('PT10')}
-                  className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${selectedAnalyicsPart === 'PT10' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >PT10 (BATT)</button>
+              <div className="mt-4 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                <p className="text-[10px] font-bold text-indigo-800 leading-relaxed"><span className="font-black">Planning Signal:</span> PT01 and PT10 show sustained growth through Sep 2026. Pre-order windows for both SKUs should be triggered in May for 8-week lead time coverage.</p>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-               <div className="md:col-span-3">
-                  <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={partTrendData[selectedAnalyicsPart]}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#9CA3AF', fontWeights: 700 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
-                      <Tooltip content={<ChartTooltip />}/>
-                      <Bar dataKey="demand" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={24} name="Demand" />
-                      <Bar dataKey="arrival" fill="#10B981" radius={[4, 4, 0, 0]} barSize={24} name="Arrival" />
-                      <Line type="monotone" dataKey="gap" stroke="#EF4444" strokeWidth={3} name="Supply Gap" dot={{ r: 4, fill: '#EF4444' }} />
-                    </BarChart>
-                  </ResponsiveContainer>
-               </div>
-               <div className="flex flex-col gap-3 justify-center">
-                  <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
-                    <p className="text-[9px] font-black text-indigo-400 uppercase mb-1">SLA Stability</p>
-                    <p className="text-xl font-black text-indigo-900">92.4%</p>
-                  </div>
-                  <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/50">
-                    <p className="text-[9px] font-black text-emerald-400 uppercase mb-1">Lead Time</p>
-                    <p className="text-xl font-black text-emerald-900">4.2d</p>
-                  </div>
-                  <button className="mt-2 w-full py-2.5 bg-gray-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg flex items-center justify-center gap-2">
-                    <RefreshCw size={12}/> Sync Stocks
-                  </button>
-               </div>
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-50">
-               <p className="text-[10px] font-bold text-gray-400 italic flex items-center gap-2">
-                 <Shield size={12} className="text-indigo-400"/> Diagnostic Profile: {selectedAnalyicsPart} showing persistent 3-day backlog in Midwest region.
-               </p>
-            </div>
-          </div>
-
-          {/* Anomaly / Outlier List (Filling the Gap) */}
-          <div className="bg-indigo-600 border border-indigo-700 rounded-2xl shadow-lg p-6 flex flex-col text-white">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h4 className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Anomalies Detected</h4>
-                <p className="text-base font-black">Resolution Outliers</p>
-              </div>
-              <Activity size={24} className="text-indigo-300 opacity-60" />
-            </div>
-            <div className="space-y-4 flex-1">
-              {topOutliers.map((o, i) => (
-                <div key={i} className="bg-indigo-500/50 p-3 rounded-xl border border-indigo-400/30">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] font-black text-indigo-100">{o.id}</span>
-                    <span className="text-[10px] font-black bg-white/20 px-2 py-0.5 rounded-full">{o.resolution}</span>
-                  </div>
-                  <p className="text-xs font-bold truncate">{o.device} • {o.reason}</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-[10px] font-bold text-indigo-200 mt-6 pt-4 border-t border-indigo-500 flex items-center gap-2 italic">
-              <Shield size={12}/> AI identifies 3.4% of total volume as process anomalies.
-            </p>
-          </div>
-
-          {/* ROW 4: Load & Human Resources */}
-
-          {/* Technician Resource Load (Full Width) */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 lg:col-span-3">
-            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Human Capital —</h4>
-            <p className="text-base font-black text-gray-900 mb-6">Technician Load & Active Cases</p>
-            <div className="space-y-4">
-              {techLoadData.map((t, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className="w-24 text-[10px] font-black text-gray-600 truncate">{t.tech}</div>
-                  <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${t.load}%` }} />
-                  </div>
-                  <div className="w-12 text-[10px] font-black text-indigo-600 text-right">{t.active} ACT</div>
-                </div>
-              ))}
             </div>
           </div>
         </div>

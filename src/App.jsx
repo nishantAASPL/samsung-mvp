@@ -37,7 +37,6 @@ export default function App() {
       case 'ENGINE': return <EngineView model={model} />;
       case 'VIEW_QUEUE': return <ReservationQueue model={model} />;
       case 'VIEW_2': return <HealthMap model={model} />;
-      case 'VIEW_2': return <HealthMap model={model} />;
       case 'VIEW_INTEL': return <PartIntelligence model={model} selectedPart={selectedPart} onPartChange={setSelectedPart} />;
       case 'NETWORK_MAP': return <NetworkTree model={model} />;
       case 'DYNAMIC_POLICY': return <PolicyTable model={model} />;
@@ -62,7 +61,7 @@ export default function App() {
           <div className="h-px w-full bg-gray-100 my-2"></div>
           <div className="mb-2">
             <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Live Operations</p>
-            <button onClick={() => setView('VIEW_QUEUE')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_QUEUE' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Requests Hub Control</button>
+            <button onClick={() => setView('VIEW_QUEUE')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_QUEUE' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Repair Reservation Hub</button>
             <button onClick={() => setView('VIEW_2')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_2' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Health Map</button>
             <button onClick={() => setView('NETWORK_MAP')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'NETWORK_MAP' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Live Topography</button>
             <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Network Intelligence</button>
