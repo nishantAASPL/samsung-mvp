@@ -11,7 +11,6 @@ const NAV_STRATEGIC = [
 ];
 const NAV_LIVE = [
   { id: 'VIEW_QUEUE', icon: List,         label: 'Reservation Queue'   },
-  { id: 'VIEW_SIM',   icon: Zap,          label: 'Live Intercept Sim'  },
   { id: 'VIEW_2',     icon: Map,          label: 'Health Map'          },
   { id: 'VIEW_3',     icon: ArrowLeftRight,label: 'Supply vs Demand'   },
   { id: 'VIEW_4',     icon: LineChart,    label: 'Part Deep-Dive'      },

@@ -26,3 +26,6 @@ dev.jsx
 !.dev.vars.example
 .env*
 !.env.example
+
+# Excluded User Inputs
+inputs/

@@ -246,16 +246,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '3,000', nextWave: 'Q1',
     data: [
-      { month: 'Jan', historical: 17, forecast: null },
-      { month: 'Feb', historical: 14, forecast: null },
-      { month: 'Mar', historical: 42, forecast: null, outlier: true },
-      { month: 'Apr', historical: 18, forecast: null },
-      { month: 'May', historical: null, forecast: 14 },
-      { month: 'Jun', historical: null, forecast: 16 },
-      { month: 'Jul', historical: null, forecast: 15 },
-      { month: 'Aug', historical: null, forecast: 16 },
-      { month: 'Sep', historical: null, forecast: 14 },
-      { month: 'Oct', historical: null, forecast: 16 }
+      { month: 'Jan', historical: 17, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 14, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 42, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 18, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 14, staticForecast: 17, installBaseForecast: 14 },
+      { month: 'Jun', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Jul', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Aug', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Sep', historical: null, forecast: 14, staticForecast: 17, installBaseForecast: 14 },
+      { month: 'Oct', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 }
     ],
     asIsData: [
       { month: 'Jan', historical: 17, forecast: null },
@@ -268,6 +268,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 42 },
       { month: 'Sep', historical: null, forecast: 42 },
       { month: 'Oct', historical: null, forecast: 42 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT22': {
@@ -276,16 +289,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '2,000', nextWave: 'Q3',
     data: [
-      { month: 'Jan', historical: 27, forecast: null },
-      { month: 'Feb', historical: 26, forecast: null },
-      { month: 'Mar', historical: 69, forecast: null, outlier: true },
-      { month: 'Apr', historical: 26, forecast: null },
-      { month: 'May', historical: null, forecast: 23 },
-      { month: 'Jun', historical: null, forecast: 24 },
-      { month: 'Jul', historical: null, forecast: 26 },
-      { month: 'Aug', historical: null, forecast: 23 },
-      { month: 'Sep', historical: null, forecast: 25 },
-      { month: 'Oct', historical: null, forecast: 26 }
+      { month: 'Jan', historical: 27, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 26, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 69, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 26, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 23, staticForecast: 28, installBaseForecast: 23 },
+      { month: 'Jun', historical: null, forecast: 24, staticForecast: 29, installBaseForecast: 24 },
+      { month: 'Jul', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 },
+      { month: 'Aug', historical: null, forecast: 23, staticForecast: 28, installBaseForecast: 23 },
+      { month: 'Sep', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Oct', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 }
     ],
     asIsData: [
       { month: 'Jan', historical: 27, forecast: null },
@@ -298,6 +311,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 69 },
       { month: 'Sep', historical: null, forecast: 69 },
       { month: 'Oct', historical: null, forecast: 69 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT23': {
@@ -306,16 +332,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '8,000', nextWave: 'Q4',
     data: [
-      { month: 'Jan', historical: 29, forecast: null },
-      { month: 'Feb', historical: 32, forecast: null },
-      { month: 'Mar', historical: 84, forecast: null, outlier: true },
-      { month: 'Apr', historical: 28, forecast: null },
-      { month: 'May', historical: null, forecast: 32 },
-      { month: 'Jun', historical: null, forecast: 28 },
-      { month: 'Jul', historical: null, forecast: 31 },
-      { month: 'Aug', historical: null, forecast: 31 },
-      { month: 'Sep', historical: null, forecast: 30 },
-      { month: 'Oct', historical: null, forecast: 29 }
+      { month: 'Jan', historical: 29, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 32, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 84, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 28, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 32, staticForecast: 38, installBaseForecast: 32 },
+      { month: 'Jun', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Jul', historical: null, forecast: 31, staticForecast: 37, installBaseForecast: 31 },
+      { month: 'Aug', historical: null, forecast: 31, staticForecast: 37, installBaseForecast: 31 },
+      { month: 'Sep', historical: null, forecast: 30, staticForecast: 36, installBaseForecast: 30 },
+      { month: 'Oct', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 }
     ],
     asIsData: [
       { month: 'Jan', historical: 29, forecast: null },
@@ -328,6 +354,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 84 },
       { month: 'Sep', historical: null, forecast: 84 },
       { month: 'Oct', historical: null, forecast: 84 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT24': {
@@ -336,16 +375,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '5,000', nextWave: 'Q3',
     data: [
-      { month: 'Jan', historical: 17, forecast: null },
-      { month: 'Feb', historical: 18, forecast: null },
-      { month: 'Mar', historical: 48, forecast: null, outlier: true },
-      { month: 'Apr', historical: 16, forecast: null },
-      { month: 'May', historical: null, forecast: 19 },
-      { month: 'Jun', historical: null, forecast: 16 },
-      { month: 'Jul', historical: null, forecast: 17 },
-      { month: 'Aug', historical: null, forecast: 20 },
-      { month: 'Sep', historical: null, forecast: 18 },
-      { month: 'Oct', historical: null, forecast: 18 }
+      { month: 'Jan', historical: 17, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 18, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 48, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 16, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 19, staticForecast: 23, installBaseForecast: 19 },
+      { month: 'Jun', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Jul', historical: null, forecast: 17, staticForecast: 20, installBaseForecast: 17 },
+      { month: 'Aug', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Sep', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Oct', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 }
     ],
     asIsData: [
       { month: 'Jan', historical: 17, forecast: null },
@@ -358,6 +397,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 48 },
       { month: 'Sep', historical: null, forecast: 48 },
       { month: 'Oct', historical: null, forecast: 48 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT25': {
@@ -366,16 +418,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '13,000', nextWave: 'Q2',
     data: [
-      { month: 'Jan', historical: 21, forecast: null },
-      { month: 'Feb', historical: 22, forecast: null },
-      { month: 'Mar', historical: 54, forecast: null, outlier: true },
-      { month: 'Apr', historical: 22, forecast: null },
-      { month: 'May', historical: null, forecast: 19 },
-      { month: 'Jun', historical: null, forecast: 18 },
-      { month: 'Jul', historical: null, forecast: 20 },
-      { month: 'Aug', historical: null, forecast: 22 },
-      { month: 'Sep', historical: null, forecast: 22 },
-      { month: 'Oct', historical: null, forecast: 21 }
+      { month: 'Jan', historical: 21, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 22, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 54, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 22, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 19, staticForecast: 23, installBaseForecast: 19 },
+      { month: 'Jun', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Jul', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Aug', historical: null, forecast: 22, staticForecast: 26, installBaseForecast: 22 },
+      { month: 'Sep', historical: null, forecast: 22, staticForecast: 26, installBaseForecast: 22 },
+      { month: 'Oct', historical: null, forecast: 21, staticForecast: 25, installBaseForecast: 21 }
     ],
     asIsData: [
       { month: 'Jan', historical: 21, forecast: null },
@@ -388,6 +440,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 54 },
       { month: 'Sep', historical: null, forecast: 54 },
       { month: 'Oct', historical: null, forecast: 54 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT26': {
@@ -396,16 +461,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '14,000', nextWave: 'Q4',
     data: [
-      { month: 'Jan', historical: 26, forecast: null },
-      { month: 'Feb', historical: 24, forecast: null },
-      { month: 'Mar', historical: 72, forecast: null, outlier: true },
-      { month: 'Apr', historical: 24, forecast: null },
-      { month: 'May', historical: null, forecast: 24 },
-      { month: 'Jun', historical: null, forecast: 27 },
-      { month: 'Jul', historical: null, forecast: 26 },
-      { month: 'Aug', historical: null, forecast: 25 },
-      { month: 'Sep', historical: null, forecast: 27 },
-      { month: 'Oct', historical: null, forecast: 26 }
+      { month: 'Jan', historical: 26, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 24, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 72, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 24, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 24, staticForecast: 29, installBaseForecast: 24 },
+      { month: 'Jun', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Jul', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 },
+      { month: 'Aug', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Sep', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Oct', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 }
     ],
     asIsData: [
       { month: 'Jan', historical: 26, forecast: null },
@@ -418,6 +483,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 72 },
       { month: 'Sep', historical: null, forecast: 72 },
       { month: 'Oct', historical: null, forecast: 72 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT27': {
@@ -426,16 +504,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '11,000', nextWave: 'Q1',
     data: [
-      { month: 'Jan', historical: 21, forecast: null },
-      { month: 'Feb', historical: 21, forecast: null },
-      { month: 'Mar', historical: 60, forecast: null, outlier: true },
-      { month: 'Apr', historical: 20, forecast: null },
-      { month: 'May', historical: null, forecast: 23 },
-      { month: 'Jun', historical: null, forecast: 24 },
-      { month: 'Jul', historical: null, forecast: 24 },
-      { month: 'Aug', historical: null, forecast: 21 },
-      { month: 'Sep', historical: null, forecast: 21 },
-      { month: 'Oct', historical: null, forecast: 23 }
+      { month: 'Jan', historical: 21, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 21, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 60, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 20, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 23, staticForecast: 28, installBaseForecast: 23 },
+      { month: 'Jun', historical: null, forecast: 24, staticForecast: 29, installBaseForecast: 24 },
+      { month: 'Jul', historical: null, forecast: 24, staticForecast: 29, installBaseForecast: 24 },
+      { month: 'Aug', historical: null, forecast: 21, staticForecast: 25, installBaseForecast: 21 },
+      { month: 'Sep', historical: null, forecast: 21, staticForecast: 25, installBaseForecast: 21 },
+      { month: 'Oct', historical: null, forecast: 23, staticForecast: 28, installBaseForecast: 23 }
     ],
     asIsData: [
       { month: 'Jan', historical: 21, forecast: null },
@@ -448,6 +526,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 60 },
       { month: 'Sep', historical: null, forecast: 60 },
       { month: 'Oct', historical: null, forecast: 60 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT28': {
@@ -456,16 +547,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '10,000', nextWave: 'Q3',
     data: [
-      { month: 'Jan', historical: 20, forecast: null },
-      { month: 'Feb', historical: 21, forecast: null },
-      { month: 'Mar', historical: 51, forecast: null, outlier: true },
-      { month: 'Apr', historical: 21, forecast: null },
-      { month: 'May', historical: null, forecast: 17 },
-      { month: 'Jun', historical: null, forecast: 18 },
-      { month: 'Jul', historical: null, forecast: 18 },
-      { month: 'Aug', historical: null, forecast: 20 },
-      { month: 'Sep', historical: null, forecast: 20 },
-      { month: 'Oct', historical: null, forecast: 21 }
+      { month: 'Jan', historical: 20, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 21, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 51, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 21, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 17, staticForecast: 20, installBaseForecast: 17 },
+      { month: 'Jun', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Jul', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Aug', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Sep', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Oct', historical: null, forecast: 21, staticForecast: 25, installBaseForecast: 21 }
     ],
     asIsData: [
       { month: 'Jan', historical: 20, forecast: null },
@@ -478,6 +569,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 51 },
       { month: 'Sep', historical: null, forecast: 51 },
       { month: 'Oct', historical: null, forecast: 51 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT29': {
@@ -486,16 +590,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '10,000', nextWave: 'Q4',
     data: [
-      { month: 'Jan', historical: 30, forecast: null },
-      { month: 'Feb', historical: 29, forecast: null },
-      { month: 'Mar', historical: 78, forecast: null, outlier: true },
-      { month: 'Apr', historical: 29, forecast: null },
-      { month: 'May', historical: null, forecast: 29 },
-      { month: 'Jun', historical: null, forecast: 29 },
-      { month: 'Jul', historical: null, forecast: 26 },
-      { month: 'Aug', historical: null, forecast: 29 },
-      { month: 'Sep', historical: null, forecast: 29 },
-      { month: 'Oct', historical: null, forecast: 30 }
+      { month: 'Jan', historical: 30, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 29, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 78, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 29, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Jun', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Jul', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 },
+      { month: 'Aug', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Sep', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Oct', historical: null, forecast: 30, staticForecast: 36, installBaseForecast: 30 }
     ],
     asIsData: [
       { month: 'Jan', historical: 30, forecast: null },
@@ -508,6 +612,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 78 },
       { month: 'Sep', historical: null, forecast: 78 },
       { month: 'Oct', historical: null, forecast: 78 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT30': {
@@ -516,16 +633,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '5,000', nextWave: 'Q2',
     data: [
-      { month: 'Jan', historical: 24, forecast: null },
-      { month: 'Feb', historical: 25, forecast: null },
-      { month: 'Mar', historical: 72, forecast: null, outlier: true },
-      { month: 'Apr', historical: 25, forecast: null },
-      { month: 'May', historical: null, forecast: 27 },
-      { month: 'Jun', historical: null, forecast: 25 },
-      { month: 'Jul', historical: null, forecast: 25 },
-      { month: 'Aug', historical: null, forecast: 25 },
-      { month: 'Sep', historical: null, forecast: 28 },
-      { month: 'Oct', historical: null, forecast: 27 }
+      { month: 'Jan', historical: 24, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 25, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 72, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 25, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Jun', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Jul', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Aug', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Sep', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Oct', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 }
     ],
     asIsData: [
       { month: 'Jan', historical: 24, forecast: null },
@@ -538,6 +655,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 72 },
       { month: 'Sep', historical: null, forecast: 72 },
       { month: 'Oct', historical: null, forecast: 72 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT31': {
@@ -546,16 +676,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '7,000', nextWave: 'Q1',
     data: [
-      { month: 'Jan', historical: 19, forecast: null },
-      { month: 'Feb', historical: 16, forecast: null },
-      { month: 'Mar', historical: 45, forecast: null, outlier: true },
-      { month: 'Apr', historical: 19, forecast: null },
-      { month: 'May', historical: null, forecast: 17 },
-      { month: 'Jun', historical: null, forecast: 16 },
-      { month: 'Jul', historical: null, forecast: 16 },
-      { month: 'Aug', historical: null, forecast: 15 },
-      { month: 'Sep', historical: null, forecast: 16 },
-      { month: 'Oct', historical: null, forecast: 17 }
+      { month: 'Jan', historical: 19, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 16, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 45, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 19, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 17, staticForecast: 20, installBaseForecast: 17 },
+      { month: 'Jun', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Jul', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Aug', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Sep', historical: null, forecast: 16, staticForecast: 19, installBaseForecast: 16 },
+      { month: 'Oct', historical: null, forecast: 17, staticForecast: 20, installBaseForecast: 17 }
     ],
     asIsData: [
       { month: 'Jan', historical: 19, forecast: null },
@@ -568,6 +698,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 45 },
       { month: 'Sep', historical: null, forecast: 45 },
       { month: 'Oct', historical: null, forecast: 45 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT32': {
@@ -576,16 +719,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '16,000', nextWave: 'Q3',
     data: [
-      { month: 'Jan', historical: 27, forecast: null },
-      { month: 'Feb', historical: 30, forecast: null },
-      { month: 'Mar', historical: 81, forecast: null, outlier: true },
-      { month: 'Apr', historical: 31, forecast: null },
-      { month: 'May', historical: null, forecast: 29 },
-      { month: 'Jun', historical: null, forecast: 27 },
-      { month: 'Jul', historical: null, forecast: 27 },
-      { month: 'Aug', historical: null, forecast: 28 },
-      { month: 'Sep', historical: null, forecast: 29 },
-      { month: 'Oct', historical: null, forecast: 29 }
+      { month: 'Jan', historical: 27, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 30, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 81, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 31, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Jun', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Jul', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Aug', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Sep', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Oct', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 }
     ],
     asIsData: [
       { month: 'Jan', historical: 27, forecast: null },
@@ -598,6 +741,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 81 },
       { month: 'Sep', historical: null, forecast: 81 },
       { month: 'Oct', historical: null, forecast: 81 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT33': {
@@ -606,16 +762,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '2,000', nextWave: 'Q4',
     data: [
-      { month: 'Jan', historical: 29, forecast: null },
-      { month: 'Feb', historical: 31, forecast: null },
-      { month: 'Mar', historical: 81, forecast: null, outlier: true },
-      { month: 'Apr', historical: 29, forecast: null },
-      { month: 'May', historical: null, forecast: 29 },
-      { month: 'Jun', historical: null, forecast: 28 },
-      { month: 'Jul', historical: null, forecast: 28 },
-      { month: 'Aug', historical: null, forecast: 31 },
-      { month: 'Sep', historical: null, forecast: 27 },
-      { month: 'Oct', historical: null, forecast: 31 }
+      { month: 'Jan', historical: 29, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 31, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 81, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 29, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 29, staticForecast: 35, installBaseForecast: 29 },
+      { month: 'Jun', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Jul', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Aug', historical: null, forecast: 31, staticForecast: 37, installBaseForecast: 31 },
+      { month: 'Sep', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Oct', historical: null, forecast: 31, staticForecast: 37, installBaseForecast: 31 }
     ],
     asIsData: [
       { month: 'Jan', historical: 29, forecast: null },
@@ -628,6 +784,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 81 },
       { month: 'Sep', historical: null, forecast: 81 },
       { month: 'Oct', historical: null, forecast: 81 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT34': {
@@ -636,16 +805,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '6,000', nextWave: 'Q2',
     data: [
-      { month: 'Jan', historical: 14, forecast: null },
-      { month: 'Feb', historical: 16, forecast: null },
-      { month: 'Mar', historical: 36, forecast: null, outlier: true },
-      { month: 'Apr', historical: 15, forecast: null },
-      { month: 'May', historical: null, forecast: 15 },
-      { month: 'Jun', historical: null, forecast: 15 },
-      { month: 'Jul', historical: null, forecast: 14 },
-      { month: 'Aug', historical: null, forecast: 14 },
-      { month: 'Sep', historical: null, forecast: 15 },
-      { month: 'Oct', historical: null, forecast: 12 }
+      { month: 'Jan', historical: 14, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 16, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 36, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 15, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Jun', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Jul', historical: null, forecast: 14, staticForecast: 17, installBaseForecast: 14 },
+      { month: 'Aug', historical: null, forecast: 14, staticForecast: 17, installBaseForecast: 14 },
+      { month: 'Sep', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Oct', historical: null, forecast: 12, staticForecast: 14, installBaseForecast: 12 }
     ],
     asIsData: [
       { month: 'Jan', historical: 14, forecast: null },
@@ -658,6 +827,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 36 },
       { month: 'Sep', historical: null, forecast: 36 },
       { month: 'Oct', historical: null, forecast: 36 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT35': {
@@ -666,16 +848,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '6,000', nextWave: 'Q1',
     data: [
-      { month: 'Jan', historical: 28, forecast: null },
-      { month: 'Feb', historical: 24, forecast: null },
-      { month: 'Mar', historical: 72, forecast: null, outlier: true },
-      { month: 'Apr', historical: 27, forecast: null },
-      { month: 'May', historical: null, forecast: 27 },
-      { month: 'Jun', historical: null, forecast: 26 },
-      { month: 'Jul', historical: null, forecast: 24 },
-      { month: 'Aug', historical: null, forecast: 27 },
-      { month: 'Sep', historical: null, forecast: 28 },
-      { month: 'Oct', historical: null, forecast: 26 }
+      { month: 'Jan', historical: 28, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 24, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 72, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 27, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Jun', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 },
+      { month: 'Jul', historical: null, forecast: 24, staticForecast: 29, installBaseForecast: 24 },
+      { month: 'Aug', historical: null, forecast: 27, staticForecast: 32, installBaseForecast: 27 },
+      { month: 'Sep', historical: null, forecast: 28, staticForecast: 34, installBaseForecast: 28 },
+      { month: 'Oct', historical: null, forecast: 26, staticForecast: 31, installBaseForecast: 26 }
     ],
     asIsData: [
       { month: 'Jan', historical: 28, forecast: null },
@@ -688,6 +870,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 72 },
       { month: 'Sep', historical: null, forecast: 72 },
       { month: 'Oct', historical: null, forecast: 72 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT36': {
@@ -696,16 +891,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms interpret short term volume surges linearly, failing to map the engineering baseline.',
     globalInventory: '4,000', nextWave: 'Q4',
     data: [
-      { month: 'Jan', historical: 18, forecast: null },
-      { month: 'Feb', historical: 22, forecast: null },
-      { month: 'Mar', historical: 54, forecast: null, outlier: true },
-      { month: 'Apr', historical: 18, forecast: null },
-      { month: 'May', historical: null, forecast: 18 },
-      { month: 'Jun', historical: null, forecast: 22 },
-      { month: 'Jul', historical: null, forecast: 19 },
-      { month: 'Aug', historical: null, forecast: 19 },
-      { month: 'Sep', historical: null, forecast: 20 },
-      { month: 'Oct', historical: null, forecast: 19 }
+      { month: 'Jan', historical: 18, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 22, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 54, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 18, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Jun', historical: null, forecast: 22, staticForecast: 26, installBaseForecast: 22 },
+      { month: 'Jul', historical: null, forecast: 19, staticForecast: 23, installBaseForecast: 19 },
+      { month: 'Aug', historical: null, forecast: 19, staticForecast: 23, installBaseForecast: 19 },
+      { month: 'Sep', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Oct', historical: null, forecast: 19, staticForecast: 23, installBaseForecast: 19 }
     ],
     asIsData: [
       { month: 'Jan', historical: 18, forecast: null },
@@ -718,6 +913,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 54 },
       { month: 'Sep', historical: null, forecast: 54 },
       { month: 'Oct', historical: null, forecast: 54 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
 
@@ -727,16 +935,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Legacy moving averages interpret the March anomalous spike as permanent growth, risking massive dead stock.',
     globalInventory: '14,200', nextWave: 'Q3',
     data: [
-      { month: 'Jan', historical: 40, forecast: null },
-      { month: 'Feb', historical: 45, forecast: null },
-      { month: 'Mar', historical: 120, forecast: null, outlier: true },
-      { month: 'Apr', historical: 55, forecast: null },
-      { month: 'May', historical: 60, forecast: 60 },
-      { month: 'Jun', historical: null, forecast: 65 },
-      { month: 'Jul', historical: null, forecast: 40 },
-      { month: 'Aug', historical: null, forecast: 30 },
-      { month: 'Sep', historical: null, forecast: 25 },
-      { month: 'Oct', historical: null, forecast: 22 }
+      { month: 'Jan', historical: 40, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 45, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 120, forecast: null, staticForecast: null, installBaseForecast: null, outlier: true },
+      { month: 'Apr', historical: 55, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: 60, forecast: 60, staticForecast: 72, installBaseForecast: 60 },
+      { month: 'Jun', historical: null, forecast: 65, staticForecast: 78, installBaseForecast: 65 },
+      { month: 'Jul', historical: null, forecast: 40, staticForecast: 48, installBaseForecast: 40 },
+      { month: 'Aug', historical: null, forecast: 30, staticForecast: 36, installBaseForecast: 30 },
+      { month: 'Sep', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Oct', historical: null, forecast: 22, staticForecast: 26, installBaseForecast: 22 }
     ],
     asIsData: [
       { month: 'Jan', historical: 40, forecast: null },
@@ -749,6 +957,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 85 },
       { month: 'Sep', historical: null, forecast: 85 },
       { month: 'Oct', historical: null, forecast: 85 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT01': {
@@ -757,16 +978,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Constant flatline historical mapping. Fails entirely to understand the device aging curve resulting in massive Q3 stockouts.',
     globalInventory: '2,840', nextWave: 'Aug',
     data: [
-      { month: 'Jan', historical: 8, forecast: null },
-      { month: 'Feb', historical: 10, forecast: null },
-      { month: 'Mar', historical: 12, forecast: null },
-      { month: 'Apr', historical: 15, forecast: null },
-      { month: 'May', historical: 14, forecast: 14 },
-      { month: 'Jun', historical: null, forecast: 18 },
-      { month: 'Jul', historical: null, forecast: 35 },
-      { month: 'Aug', historical: null, forecast: 55 }, // High failure zone
-      { month: 'Sep', historical: null, forecast: 25 },
-      { month: 'Oct', historical: null, forecast: 15 }
+      { month: 'Jan', historical: 8, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 10, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 12, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Apr', historical: 15, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: 14, forecast: 14, staticForecast: 17, installBaseForecast: 14 },
+      { month: 'Jun', historical: null, forecast: 18, staticForecast: 22, installBaseForecast: 18 },
+      { month: 'Jul', historical: null, forecast: 35, staticForecast: 42, installBaseForecast: 35 },
+      { month: 'Aug', historical: null, forecast: 55, staticForecast: 66, installBaseForecast: 55 }, // High failure zone
+      { month: 'Sep', historical: null, forecast: 25, staticForecast: 30, installBaseForecast: 25 },
+      { month: 'Oct', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 }
     ],
     asIsData: [
       { month: 'Jan', historical: 8, forecast: null },
@@ -779,6 +1000,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 14 },
       { month: 'Sep', historical: null, forecast: 14 },
       { month: 'Oct', historical: null, forecast: 14 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT08': {
@@ -787,16 +1021,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Standard algorithms fail to interpret seasonal or geographical data mapping, consistently under-ordering.',
     globalInventory: '8,400', nextWave: 'May',
     data: [
-      { month: 'Jan', historical: 14, forecast: null },
-      { month: 'Feb', historical: 15, forecast: null },
-      { month: 'Mar', historical: 18, forecast: null },
-      { month: 'Apr', historical: 25, forecast: null },
-      { month: 'May', historical: 35, forecast: 35 }, // summer spike
-      { month: 'Jun', historical: null, forecast: 40 },
-      { month: 'Jul', historical: null, forecast: 42 },
-      { month: 'Aug', historical: null, forecast: 20 },
-      { month: 'Sep', historical: null, forecast: 15 },
-      { month: 'Oct', historical: null, forecast: 15 }
+      { month: 'Jan', historical: 14, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 15, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 18, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Apr', historical: 25, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: 35, forecast: 35, staticForecast: 42, installBaseForecast: 35 }, // summer spike
+      { month: 'Jun', historical: null, forecast: 40, staticForecast: 48, installBaseForecast: 40 },
+      { month: 'Jul', historical: null, forecast: 42, staticForecast: 50, installBaseForecast: 42 },
+      { month: 'Aug', historical: null, forecast: 20, staticForecast: 24, installBaseForecast: 20 },
+      { month: 'Sep', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 },
+      { month: 'Oct', historical: null, forecast: 15, staticForecast: 18, installBaseForecast: 15 }
     ],
     asIsData: [
       { month: 'Jan', historical: 14, forecast: null },
@@ -809,6 +1043,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 25 },
       { month: 'Sep', historical: null, forecast: 25 },
       { month: 'Oct', historical: null, forecast: 25 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   },
   'PT19': {
@@ -817,16 +1064,16 @@ export const partIntelligenceData = {
     insightAsIs: 'Continues compounding inventory due to false minimum requirement logic ignoring massive 48 month span.',
     globalInventory: '19,500', nextWave: '2028',
     data: [
-      { month: 'Jan', historical: 60, forecast: null },
-      { month: 'Feb', historical: 55, forecast: null },
-      { month: 'Mar', historical: 40, forecast: null },
-      { month: 'Apr', historical: 25, forecast: null },
-      { month: 'May', historical: 10, forecast: 10 },
-      { month: 'Jun', historical: null, forecast: 0 },
-      { month: 'Jul', historical: null, forecast: 0 },
-      { month: 'Aug', historical: null, forecast: 0 },
-      { month: 'Sep', historical: null, forecast: 0 },
-      { month: 'Oct', historical: null, forecast: 0 }
+      { month: 'Jan', historical: 60, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Feb', historical: 55, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Mar', historical: 40, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'Apr', historical: 25, forecast: null, staticForecast: null, installBaseForecast: null },
+      { month: 'May', historical: 10, forecast: 10, staticForecast: 12, installBaseForecast: 10 },
+      { month: 'Jun', historical: null, forecast: 0, staticForecast: 0, installBaseForecast: 0 },
+      { month: 'Jul', historical: null, forecast: 0, staticForecast: 0, installBaseForecast: 0 },
+      { month: 'Aug', historical: null, forecast: 0, staticForecast: 0, installBaseForecast: 0 },
+      { month: 'Sep', historical: null, forecast: 0, staticForecast: 0, installBaseForecast: 0 },
+      { month: 'Oct', historical: null, forecast: 0, staticForecast: 0, installBaseForecast: 0 }
     ],
     asIsData: [
       { month: 'Jan', historical: 60, forecast: null },
@@ -839,6 +1086,19 @@ export const partIntelligenceData = {
       { month: 'Aug', historical: null, forecast: 30 },
       { month: 'Sep', historical: null, forecast: 30 },
       { month: 'Oct', historical: null, forecast: 30 }
+    ],
+    partnerAvailability: [
+      { partnerId: 'P-045', name: 'Northeast Hub (NY)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-092', name: 'West Coast Hub (LA)', stock: Math.floor(Math.random() * 500), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-142', name: 'Central Hub (CHI)', stock: Math.floor(Math.random() * 100), status: 'Critical', threshold: 150 },
+      { partnerId: 'P-187', name: 'Suburban Hub (NAP)', stock: Math.floor(Math.random() * 300), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-210', name: 'South Hub (DAL)', stock: Math.floor(Math.random() * 500), status: 'Healthy', threshold: 50 },
+      { partnerId: 'P-301', name: 'Southeast Hub (MIA)', stock: Math.floor(Math.random() * 200), status: 'Warning', threshold: 100 },
+      { partnerId: 'P-404', name: 'Northwest Hub (SEA)', stock: Math.floor(Math.random() * 400), status: 'Healthy', threshold: 80 }
+    ],
+    rebalancingScenarios: [
+      { id: 1, source: 'P-045', dest: 'P-142', quantity: Math.floor(Math.random()*50)+10, costSavings: Math.floor(Math.random()*5000)+1000, slaImpact: '+2.4%', timeToExecute: '4 hrs', risk: 'Low' },
+      { id: 2, source: 'P-210', dest: 'P-092', quantity: Math.floor(Math.random()*30)+10, costSavings: Math.floor(Math.random()*3000)+500, slaImpact: '+1.1%', timeToExecute: '12 hrs', risk: 'Medium' }
     ]
   }
 };
