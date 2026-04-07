@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, Calculator, List, Zap, Map, ArrowLeftRight, LineChart, Factory, MapPin, BarChart3, BookOpen, ServerCog, BrainCircuit, RefreshCw } from 'lucide-react';
+import { Target, Calculator, List, Zap, Map, LineChart, Factory, MapPin, BarChart3, BookOpen, ServerCog, BrainCircuit, RefreshCw } from 'lucide-react';
 import { partners } from './data/mockData';
 
 // Import Views
@@ -7,7 +7,6 @@ import ScopeView from './components/views/ScopeView';
 import EngineView from './components/views/EngineView';
 import ReservationQueue from './components/views/ReservationQueue';
 import HealthMap from './components/views/HealthMap';
-import DemandGap from './components/views/DemandGap';
 import PartIntelligence from './components/views/PartIntelligence';
 import NetworkTree from './components/views/NetworkTree';
 import PolicyTable from './components/views/PolicyTable';
@@ -38,7 +37,7 @@ export default function App() {
       case 'ENGINE': return <EngineView model={model} />;
       case 'VIEW_QUEUE': return <ReservationQueue model={model} />;
       case 'VIEW_2': return <HealthMap model={model} />;
-      case 'VIEW_3': return <DemandGap model={model} />;
+      case 'VIEW_2': return <HealthMap model={model} />;
       case 'VIEW_INTEL': return <PartIntelligence model={model} selectedPart={selectedPart} onPartChange={setSelectedPart} />;
       case 'NETWORK_MAP': return <NetworkTree model={model} />;
       case 'DYNAMIC_POLICY': return <PolicyTable model={model} />;
@@ -67,13 +66,12 @@ export default function App() {
             <button onClick={() => setView('VIEW_2')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_2' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Health Map</button>
             <button onClick={() => setView('NETWORK_MAP')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'NETWORK_MAP' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Map size={16} /> Live Topography</button>
             <button onClick={() => setView('VIEW_INTEL')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_INTEL' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><LineChart size={16} /> Network Intelligence</button>
-            <button onClick={() => setView('VIEW_3')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'VIEW_3' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><ArrowLeftRight size={16} /> Supply vs Demand</button>
           </div>
           <div className="h-px w-full bg-gray-100 my-2"></div>
           <div>
             <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-2">Policy Dashboards</p>
             <button onClick={() => setView('DYNAMIC_POLICY')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'DYNAMIC_POLICY' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><List size={16} /> Stocking Rules</button>
-            <button onClick={() => setView('OEM')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'OEM' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Factory size={16} /> Network Hub</button>
+            <button onClick={() => setView('OEM')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'OEM' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><Factory size={16} /> OEM Control Hub</button>
             <button onClick={() => setView('PARTNER')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all mb-1 ${view === 'PARTNER' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><MapPin size={16} /> Partner Detail</button>
             <button onClick={() => setView('VIEW_5')} className={`w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-semibold transition-all ${view === 'VIEW_5' ? 'bg-[#EBF0FA] text-[#1428A0]' : 'text-gray-600 hover:bg-gray-50'}`}><BarChart3 size={16} /> Impact Scorecard</button>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, LineChart as LineChartIcon, Target, Zap, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Battery, Info, ZoomIn, ArrowRightLeft, ArrowRight, ShieldCheck, MapPin, Box, DollarSign, BarChart2 } from 'lucide-react';
+import { ChevronDown, LineChart as LineChartIcon, Target, Zap, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Battery, Info, ZoomIn, ArrowRightLeft, ArrowRight, ShieldCheck, MapPin, Box, DollarSign, BarChart2, Globe } from 'lucide-react';
 import { partIntelligenceData } from '../../data/mockData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot, ReferenceArea, Area, AreaChart, ComposedChart, Legend } from 'recharts';
 
@@ -19,7 +19,7 @@ export default function PartIntelligence({ model, selectedPart, onPartChange }) 
 
   // Dynamic Deterministic KPI Generation based on Part ID & Stats
   const ptCharValue = activePartId.charCodeAt(activePartId.length - 1) || 1; 
-  const inventoryVol = intelligence.globalInventory || 1000;
+  const inventoryVol = parseInt(intelligence.globalInventory?.toString().replace(/,/g, '') || '1000');
   const unitprice = intelligence.cost || 10;
   
   const baseSl = Math.min(96, 75 + (ptCharValue % 15));
@@ -171,6 +171,94 @@ export default function PartIntelligence({ model, selectedPart, onPartChange }) 
                <p className={`text-xs font-semibold leading-relaxed ${isToBe ? 'text-emerald-800/80' : 'text-red-800/80'} max-w-xl`}>
                   {isToBe ? intelligence.insightToBe : intelligence.insightAsIs}
                </p>
+            </div>
+         </div>
+      </div>
+
+      {/* NEW ROW: LIFECYCLE & SUPPLY GAP */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-shrink-0">
+         {/* Demographic Drivers */}
+         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-center hover:border-indigo-200 transition-all">
+            <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+               <Globe className="text-indigo-600" size={14} /> Demographic Lifecycle Drivers
+            </h3>
+            <div className="grid grid-cols-3 gap-6">
+               <div>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Install Base</p>
+                  <p className="text-2xl font-black text-gray-900 leading-none">
+                     {(inventoryVol * 1.8).toLocaleString()} <span className="text-[10px] font-bold text-gray-400 uppercase">Devices</span>
+                  </p>
+               </div>
+               <div>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Avg Fleet Age</p>
+                  <p className="text-2xl font-black text-indigo-600 leading-none">
+                     {ptCharValue % 12 + 18} <span className="text-[10px] font-bold text-gray-400 uppercase">Months</span>
+                  </p>
+               </div>
+               <div>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Eng. MTBF</p>
+                  <p className="text-2xl font-black text-gray-900 leading-none">
+                     14 <span className="text-[10px] font-bold text-gray-400 uppercase">Months</span>
+                  </p>
+               </div>
+            </div>
+            <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-4">
+               <div className="p-2 bg-white rounded-lg shadow-sm">
+                  <Target size={20} className="text-indigo-600"/>
+               </div>
+               <div>
+                  <p className="text-xs font-bold text-gray-700">Predictive Lifecycle Wave:</p>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5">Average device age is {Math.floor((ptCharValue % 12 + 18) / 14)}x the MTBF. Entering critical replacement cycle.</p>
+               </div>
+            </div>
+         </div>
+
+         {/* Actionable Supply Gap */}
+         <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-500 flex flex-col justify-center overflow-hidden relative group ${isToBe ? 'bg-indigo-900 border-indigo-700 text-white' : 'bg-white border-gray-200'}`}>
+            {isToBe && <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity"><Zap size={100} /></div>}
+            <h3 className={`text-[11px] font-black uppercase tracking-widest mb-6 flex items-center gap-2 ${isToBe ? 'text-indigo-300' : 'text-gray-400'}`}>
+               <BarChart2 className={isToBe ? 'text-indigo-300' : 'text-indigo-600'} size={14} /> Actionable Supply Gap Analysis
+            </h3>
+            
+            <div className="space-y-5 relative z-10">
+               {[
+                  { label: 'Projected Peak Demand', val: `${Math.round(avgMonthlyDemand * 2.4)} Units`, pct: 100 },
+                  { label: 'Current Network Stock', val: `${inventoryVol} Units`, pct: (inventoryVol / (avgMonthlyDemand * 2.4)) * 100 },
+               ].map(({ label, val, pct }) => (
+                  <div key={label}>
+                     <div className="flex justify-between items-end mb-2">
+                        <span className={`text-[11px] font-bold ${isToBe ? 'text-indigo-100' : 'text-gray-500'}`}>{label}</span>
+                        <span className="font-black text-sm">{val}</span>
+                     </div>
+                     <div className={`w-full h-3 rounded-full overflow-hidden ${isToBe ? 'bg-white/10' : 'bg-gray-100'}`}>
+                        <div className={`h-full rounded-full transition-all duration-1000 ${isToBe ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]' : 'bg-gray-400'}`} style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+                     </div>
+                  </div>
+               ))}
+
+               <div className="pt-5 border-t border-gray-200/20">
+                  {isToBe ? (
+                     <div className="flex items-start gap-4">
+                        <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg shrink-0">
+                           <ShieldCheck size={20}/>
+                        </div>
+                        <div>
+                           <p className="font-black text-sm text-white mb-0.5">Gap Filled: AI Pre-Order Active</p>
+                           <p className="text-[10px] font-semibold text-indigo-200 leading-relaxed">System pre-emptively secured supply to match the MTBF curve, neutralizing stockout risk.</p>
+                        </div>
+                     </div>
+                  ) : (
+                     <div className="flex items-start gap-4 p-4 bg-red-50 border border-red-100 rounded-xl">
+                        <div className="p-2 bg-red-100 text-red-600 rounded-lg shrink-0">
+                           <AlertTriangle size={20}/>
+                        </div>
+                        <div>
+                           <p className="font-black text-sm text-red-700 mb-0.5">Critical Gap: {Math.max(0, Math.round(avgMonthlyDemand * 2.4) - inventoryVol)} Units</p>
+                           <p className="text-[10px] font-bold text-red-600 leading-relaxed uppercase">Manual trigger pending. Static system blind to upcoming trend.</p>
+                        </div>
+                     </div>
+                  )}
+               </div>
             </div>
          </div>
       </div>
