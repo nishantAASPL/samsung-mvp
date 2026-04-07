@@ -82,6 +82,37 @@ export default function PartIntelligence({ model, selectedPart, onPartChange }) 
 
   const displayedChartData = patchGraphData(forecastView === '6M' ? chartData.slice(0, 6) : chartData);
 
+  // ─── CUSTOM TOOLTIP ───────────────────────────────────────────────────────────
+  const ChartTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      // Filter out Area components that don't have a custom name (appears as dataKey)
+      const validPayload = payload.filter(item => item.name && item.name !== item.dataKey);
+      
+      if (validPayload.length === 0) return null;
+
+      return (
+        <div className="bg-white/95 backdrop-blur-sm p-4 rounded-2xl border border-gray-100 shadow-2xl ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between gap-4 mb-3 border-b border-gray-50 pb-2">
+             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+             <Zap size={12} className="text-amber-500 opacity-50"/>
+          </div>
+          <div className="space-y-2.5">
+            {validPayload.map((item, index) => (
+              <div key={index} className="flex items-center justify-between gap-8 text-nowrap">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-[11px] font-bold text-gray-600">{item.name}</span>
+                </div>
+                <span className="text-[11px] font-black text-gray-900">{item.value?.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 h-full flex flex-col pb-10">
       
@@ -327,9 +358,8 @@ export default function PartIntelligence({ model, selectedPart, onPartChange }) 
                    />
                    
                    <Tooltip 
-                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }}
-                     itemStyle={{ fontWeight: 'bold' }}
-                     cursor={{ stroke: '#E5E7EB', strokeWidth: 2, strokeDasharray: '4 4' }}
+                      content={<ChartTooltip />}
+                      cursor={{ stroke: '#E5E7EB', strokeWidth: 2, strokeDasharray: '4 4' }}
                    />
                    
                    <ReferenceArea x1="May" x2="Oct" fill="#F8FAFC" fillOpacity={1} />
@@ -401,11 +431,11 @@ export default function PartIntelligence({ model, selectedPart, onPartChange }) 
                 {intelligence.partnerAvailability.map((p, i) => (
                   <div key={i} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors shrink-0">
                     <div>
+                      <p className="text-[8px] font-black text-indigo-600 mb-0.5">{p.partnerId}</p>
                       <p className="text-sm font-bold text-gray-900">{p.name}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${p.status === 'Healthy' ? 'bg-green-100 text-green-700' : p.status === 'Warning' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-                          {p.status}
-                        </span>
+                        <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Reserve Hub</span>
+                        <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                         <span className="text-[10px] text-gray-500 font-semibold">Min: {p.threshold}</span>
                       </div>
                     </div>

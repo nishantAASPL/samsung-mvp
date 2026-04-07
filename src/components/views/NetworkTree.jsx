@@ -305,6 +305,7 @@ export default function NetworkTree({ model }) {
                                    <p className={`text-md font-black tracking-tighter ${partner.basePartnerStock < partner.partnerThreshold ? 'text-red-600' : isToBe ? 'text-emerald-600' : 'text-gray-900'}`}>{partner.basePartnerStock}</p>
                                 </div>
                                 <div className="border-t border-gray-50 pt-1 text-left">
+                                   <p className="text-[8px] font-black text-indigo-600 mb-0.5">{partner.id}</p>
                                    <p className="font-bold text-gray-800 text-[9px] truncate">{partner.name}</p>
                                    <p className="text-[7px] font-black uppercase text-gray-400">{partner.region}</p>
                                 </div>
