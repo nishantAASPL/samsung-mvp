@@ -55,97 +55,92 @@ export default function OemDashboard({ model }) {
   ];
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-700 pb-12">
-      
+    <div className="max-w-[1400px] mx-auto space-y-5 pb-12">
+
       {/* HEADER SECTION */}
-      <div className="flex justify-between items-start border-b border-gray-200 pb-6 mb-8">
+      <div className="flex justify-between items-start border-b border-gray-200 pb-4 mb-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-indigo-600 rounded-lg shadow-indigo-100 shadow-lg">
-               <Globe className="text-white" size={20}/>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-indigo-600 rounded text-white">
+               <Globe size={18}/>
             </div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tighter">OEM <span className="text-indigo-600">Control Hub</span></h2>
+            <h2 className="text-2xl font-bold text-gray-900">OEM Control Hub</h2>
           </div>
-          <p className="text-sm font-semibold text-gray-400 max-w-2xl leading-relaxed">
+          <p className="text-xs font-medium text-gray-600 max-w-2xl">
             Global monitoring hub for the Samsung Supply Chain. Aggregating telemetry across 5 regional partners and 250+ storage nodes.
           </p>
         </div>
-        
-        <div className={`flex items-center gap-3 px-5 py-2.5 rounded-2xl border-2 shadow-sm backdrop-blur-md transition-all ${isToBe ? 'bg-emerald-50/50 border-emerald-200 text-emerald-700' : 'bg-orange-50/50 border-orange-200 text-orange-700'}`}>
-          {isToBe ? <ShieldCheck size={20} className="animate-pulse" /> : <AlertTriangle size={20} />}
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-60 leading-none mb-1">Logic System</span>
-            <span className="text-sm font-black uppercase tracking-tight">{isToBe ? 'Predictive MTBF Engine' : 'Static Legacy Thresholds'}</span>
+
+        <div className={`flex items-center gap-2 px-3 py-2 rounded border text-sm font-bold uppercase tracking-wide ${isToBe ? 'bg-white border-gray-300 text-indigo-700' : 'bg-white border-gray-300 text-gray-700'}`}>
+          {isToBe ? <ShieldCheck size={16} /> : <AlertTriangle size={16} />}
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-semibold text-gray-500 tracking-widest">Logic</span>
+            <span className="text-xs font-black">{isToBe ? 'MTBF Engine' : 'Legacy'}</span>
           </div>
         </div>
       </div>
 
       {/* EXECUTIVE TELEMETRY STRIP */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
          {[
            { label: 'Network FTFR', val: `${currentMetrics.ftfr}%`, trend: currentMetrics.ftfrTrend, icon: Activity, up: isToBe },
            { label: 'Day-of Stockouts', val: currentMetrics.stockouts, trend: model === 'AS_IS' ? 'High Risk' : '-78% Drop', icon: PackageX, danger: model === 'AS_IS' },
            { label: 'Dead Stock Value', val: currentMetrics.deadStock, trend: currentMetrics.deadStockTrend, icon: Banknote, up: !isToBe },
            { label: 'Wait-Time Avg', val: currentMetrics.avgWaitTime, trend: '-2.4 Days', icon: Clock, up: false }
          ].map((m, i) => (
-           <div key={i} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-              <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity rotate-12 scale-150">
-                 <m.icon size={80} />
-              </div>
-              <div className="flex justify-between items-start relative z-10 mb-4">
-                 <div className={`p-2 rounded-xl ${m.danger ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-400 group-hover:text-indigo-600 group-hover:bg-indigo-50'} transition-colors`}>
-                    <m.icon size={18}/>
+           <div key={i} className="bg-white p-4 rounded border border-gray-200">
+              <div className="flex justify-between items-start mb-3">
+                 <div className="p-2 rounded bg-gray-100 text-gray-600">
+                    <m.icon size={16}/>
                  </div>
-                 <div className={`flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full ${m.up ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                 <div className={`flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded ${m.danger ? 'bg-gray-100 text-red-700' : m.up ? 'bg-gray-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>
                    {m.up ? <ArrowUpRight size={10}/> : <ArrowDownRight size={10}/>} {m.trend}
                  </div>
               </div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{m.label}</p>
-              <h3 className="text-3xl font-black text-gray-900">{m.val}</h3>
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wide mb-1">{m.label}</p>
+              <h3 className="text-2xl font-black text-gray-900">{m.val}</h3>
            </div>
          ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
         {/* ACTION TERMINAL */}
-        <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden h-full">
-           <div className="p-4 bg-gray-900 border-b border-gray-800 flex items-center justify-between">
+        <div className="lg:col-span-1 bg-white rounded border border-gray-200 flex flex-col overflow-hidden h-full">
+           <div className="p-3 bg-gray-900 border-b border-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                 <h3 className="text-[11px] font-black text-white uppercase tracking-widest flex items-center gap-2">
-                   Live Alert Terminal
+                 <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                 <h3 className="text-[10px] font-bold text-white uppercase tracking-wide">
+                   Live Alerts
                  </h3>
               </div>
-              <span className="text-[9px] font-bold text-gray-500 font-mono">ID: NW-OS-882</span>
+              <span className="text-[8px] font-bold text-gray-500 font-mono">NW-882</span>
            </div>
-           
+
            <div className="flex-1 p-3 space-y-2 overflow-y-auto max-h-[500px]">
               {currentMetrics.alerts.map(a => (
-                <div key={a.id} className={`p-4 rounded-xl border flex flex-col gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
-                  a.type === 'danger' ? 'bg-red-50/50 border-red-100 hover:border-red-300' : 
-                  a.type === 'warning' ? 'bg-orange-50/50 border-orange-100 hover:border-orange-300' : 
-                  'bg-indigo-50/50 border-indigo-100 hover:border-indigo-300'
+                <div key={a.id} className={`p-3 rounded border flex flex-col gap-2 cursor-pointer ${
+                  a.type === 'danger' ? 'bg-white border-red-300' :
+                  a.type === 'warning' ? 'bg-white border-gray-300' :
+                  'bg-white border-gray-300'
                 }`}>
-                   <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${a.type === 'danger' ? 'bg-red-100/50 text-red-600' : a.type === 'warning' ? 'bg-orange-100/50 text-orange-600' : 'bg-indigo-100/50 text-indigo-600'}`}>
-                         {a.type === 'danger' ? <AlertTriangle size={16}/> : a.type === 'warning' ? <AlertTriangle size={16}/> : <ShieldCheck size={16}/>}
+                   <div className="flex items-start gap-2">
+                      <div className={`p-1.5 rounded ${a.type === 'danger' ? 'bg-red-100 text-red-700' : a.type === 'warning' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>
+                         {a.type === 'danger' ? <AlertTriangle size={14}/> : a.type === 'warning' ? <AlertTriangle size={14}/> : <ShieldCheck size={14}/>}
                       </div>
-                      <div>
-                         <p className={`text-[10px] font-black uppercase tracking-widest mb-0.5 ${a.type === 'danger' ? 'text-red-700' : a.type === 'warning' ? 'text-orange-700' : 'text-indigo-700'}`}>{a.title}</p>
-                         <p className="text-xs text-gray-700 font-semibold leading-tight">{a.msg}</p>
+                      <div className="flex-1">
+                         <p className={`text-[9px] font-bold uppercase tracking-wide mb-0.5 ${a.type === 'danger' ? 'text-red-700' : 'text-gray-700'}`}>{a.title}</p>
+                         <p className="text-[10px] text-gray-700 font-medium leading-tight">{a.msg}</p>
                       </div>
                    </div>
-                   
+
                    {isToBe && (
-                      <button className={`mt-2 py-1.5 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 self-end transition-all ${
-                        a.type === 'danger' ? 'bg-red-600 text-white shadow-md shadow-red-200' : 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                      }`}>
-                         <Zap size={12}/> Resolve Violation
+                      <button className="mt-2 py-1.5 px-2 rounded text-[9px] font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 self-end bg-indigo-600 text-white hover:bg-indigo-700">
+                         <Zap size={11}/> Resolve
                       </button>
                    ) || (
-                      <div className="mt-2 flex items-center gap-1.5 text-[9px] font-bold text-gray-400 italic">
-                         <Info size={10}/> Pending manual review by Hub Manager
+                      <div className="mt-1 flex items-center gap-1 text-[8px] font-medium text-gray-500">
+                         <Info size={10}/> Pending review
                       </div>
                    )}
                 </div>
