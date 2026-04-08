@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   MapPin, CheckCircle2, AlertTriangle, Clock, User, Wrench, Filter, Search,
   BarChart3, Activity, Calendar, ArrowUpRight, ArrowDownRight, History, Inbox,
@@ -11,6 +11,7 @@ import {
   ComposedChart, ReferenceLine
 } from 'recharts';
 import { oemMetrics } from '../../data/mockData';
+import { requestTelemetry } from '../../data/telemetry';
 
 // ─── MOCK DATA ────────────────────────────────────────────────────────────────
 // Canonical part map — mirrors Part Intelligence exactly
@@ -136,6 +137,84 @@ const actionableInsightsData = [
   { color: 'indigo', icon: Star, title: 'FTFR Up +4pp Week-on-Week', desc: 'FTFR improved 87% → 91% this week. Primary driver: Z Fold4 screen protector (PT35) stock alignment across 3 partner stores.', action: 'View Report' },
 ];
 
+// ─── PERFORMANCE TAB ENHANCEMENT DATA ──────────────────────────────────────────
+// RCA Drill-Down Table Data
+const rcaDrilldownData = [
+  { partner: 'Central Hub (CHI)', part: 'PT01 — S24U OLED', delayedCount: 14, cause: 'Part Stockout', avgDelay: 3.2, pctTotal: 42, status: 'critical', action: 'Raise stock level to 25 units' },
+  { partner: 'Central Hub (CHI)', part: 'PT10 — A54 Battery', delayedCount: 8, cause: 'Part Stockout', avgDelay: 2.8, pctTotal: 24, status: 'critical', action: 'Reorder 15 units' },
+  { partner: 'Southeast Hub (MIA)', part: 'PT01 — S24U OLED', delayedCount: 6, cause: 'Wrong Routing', avgDelay: 2.4, pctTotal: 18, status: 'high', action: 'Enable AI routing at MIA-301' },
+  { partner: 'West Coast Hub (LA)', part: 'PT34 — M34 AMOLED', delayedCount: 5, cause: 'Tech Unavailable', avgDelay: 1.9, pctTotal: 15, status: 'medium', action: 'Add technician Saturday shift' },
+  { partner: 'Suburban Hub (NAP)', part: 'PT08 — S24 Port', delayedCount: 3, cause: 'Admin Error', avgDelay: 1.2, pctTotal: 9, status: 'low', action: 'Training on intake forms' },
+];
+
+// Top Delayed Parts Table Data
+const topDelayedPartsData = [
+  { sku: 'PT01', part: 'S24U OLED Display', delayEvents: 20, avgOosDays: 3.2, minStock: 15, maxStock: 45, status: 'critical' },
+  { sku: 'PT10', part: 'A54 Battery Pack', delayEvents: 8, avgOosDays: 2.1, minStock: 20, maxStock: 50, status: 'critical' },
+  { sku: 'PT34', part: 'M34 AMOLED Screen', delayEvents: 6, avgOosDays: 1.8, minStock: 12, maxStock: 35, status: 'high' },
+  { sku: 'PT08', part: 'S24 Charging Port', delayEvents: 4, avgOosDays: 0.9, minStock: 18, maxStock: 40, status: 'medium' },
+  { sku: 'PT35', part: 'Z Fold4 Protector', delayEvents: 2, avgOosDays: 0.4, minStock: 8, maxStock: 25, status: 'low' },
+  { sku: 'PT36', part: 'Watch 6 Battery', delayEvents: 1, avgOosDays: 0.2, minStock: 6, maxStock: 15, status: 'low' },
+];
+
+// Partner Performance Comparative Table Data (enhanced)
+const partnerComparisonData = [
+  { partner: 'Central Hub (CHI)', slaRate: 96, avgLeadTime: 2.1, stockouts: 3, customerScore: 4.8, tier: 'Platinum' },
+  { partner: 'Northwest Hub (SEA)', slaRate: 91, avgLeadTime: 2.4, stockouts: 4, customerScore: 4.6, tier: 'Gold' },
+  { partner: 'Northeast Hub (NY)', slaRate: 94, avgLeadTime: 2.8, stockouts: 6, customerScore: 4.5, tier: 'Gold' },
+  { partner: 'South Hub (DAL)', slaRate: 89, avgLeadTime: 3.5, stockouts: 8, customerScore: 4.2, tier: 'Gold' },
+  { partner: 'West Coast Hub (LA)', slaRate: 88, avgLeadTime: 3.2, stockouts: 9, customerScore: 4.1, tier: 'Platinum' },
+  { partner: 'Suburban Hub (NAP)', slaRate: 82, avgLeadTime: 4.1, stockouts: 12, customerScore: 3.8, tier: 'Silver' },
+  { partner: 'Southeast Hub (MIA)', slaRate: 72, avgLeadTime: 4.8, stockouts: 16, customerScore: 3.2, tier: 'Silver' },
+];
+
+// ─── DEMAND PLANNING TAB ENHANCEMENT DATA ──────────────────────────────────────
+// Install Base by Region (Model × Region)
+const installBaseByRegion = [
+  { model: 'S24 Ultra', nMetro: 50000, sMetro: 38000, ruralW: 12000, total: 100000, avgAge: 18 },
+  { model: 'A54', nMetro: 85000, sMetro: 62000, ruralW: 28000, total: 175000, avgAge: 24 },
+  { model: 'M34', nMetro: 35000, sMetro: 28000, ruralW: 16000, total: 79000, avgAge: 32 },
+  { model: 'Z Fold4', nMetro: 12000, sMetro: 8500, ruralW: 2500, total: 23000, avgAge: 14 },
+  { model: 'S22 Pro', nMetro: 8000, sMetro: 6500, ruralW: 1500, total: 16000, avgAge: 45 },
+  { model: 'TOTAL', nMetro: 190000, sMetro: 143000, ruralW: 60000, total: 393000, avgAge: 26 },
+];
+
+// Failure Rates by Part
+const failureRateByPart = [
+  { model: 'S24 Ultra', part: 'PT01 — OLED Display', failPct: 8.0, bomQty: 1, annualDemand: 4000, demand: 667 },
+  { model: 'S24 Ultra', part: 'PT08 — Charging Port', failPct: 3.2, bomQty: 1, annualDemand: 1600, demand: 267 },
+  { model: 'A54', part: 'PT10 — Battery Pack', failPct: 12.0, bomQty: 1, annualDemand: 8400, demand: 1400 },
+  { model: 'A54', part: 'PT08 — Charging Port', failPct: 4.1, bomQty: 1, annualDemand: 2870, demand: 478 },
+  { model: 'M34', part: 'PT34 — AMOLED Screen', failPct: 6.5, bomQty: 1, annualDemand: 3094, demand: 516 },
+  { model: 'M34', part: 'PT19 — Back Panel', failPct: 7.0, bomQty: 1, annualDemand: 3367, demand: 561 },
+  { model: 'Z Fold4', part: 'PT35 — Screen Protector', failPct: 9.5, bomQty: 1, annualDemand: 1449, demand: 241 },
+];
+
+// BOM Usage Per Repair Type
+const bomUsageData = [
+  { repairType: 'Battery Swap', parts: 'Battery Pack + Adhesive', skus: 'PT10, ADH-GEN', qty: '1, 1', cost: 34.00 + 2.50, laborCost: 145.00, total: 181.50 },
+  { repairType: 'Screen Replace', parts: 'Display + Frame Seal', skus: 'PT01/PT34, SEAL-KIT', qty: '1, 1', cost: 120.00 + 8.00, laborCost: 280.00, total: 408.00 },
+  { repairType: 'Charge Port Repair', parts: 'Charging Port + Flex', skus: 'PT08, FLEX-CHG', qty: '1, 1', cost: 22.00 + 5.00, laborCost: 95.00, total: 122.00 },
+  { repairType: 'Back Panel Replace', parts: 'Back Panel + Adhesive', skus: 'PT19, ADH-GEN', qty: '1, 1', cost: 45.00 + 2.50, laborCost: 120.00, total: 167.50 },
+  { repairType: 'Protector/Screen Seal', parts: 'Screen Protector', skus: 'PT35', qty: '1', cost: 8.00, laborCost: 45.00, total: 53.00 },
+];
+
+// Expected Monthly Demand with formula
+const expectedMonthlyDemand = [
+  { sku: 'PT01 — S24U OLED', ib: 100000, failRate: 8.0, bomQty: 1, monthlyBase: 667, peakMultiplier: 1.35, peak: 901 },
+  { sku: 'PT10 — A54 Battery', ib: 175000, failRate: 12.0, bomQty: 1, monthlyBase: 1400, peakMultiplier: 1.35, peak: 1890 },
+  { sku: 'PT34 — M34 AMOLED', ib: 79000, failRate: 6.5, bomQty: 1, monthlyBase: 516, peakMultiplier: 1.35, peak: 696 },
+  { sku: 'PT08 — S24 Port', ib: 275000, failRate: 3.6, bomQty: 1, monthlyBase: 825, peakMultiplier: 1.35, peak: 1114 },
+  { sku: 'PT35 — Z Fold4 Protector', ib: 23000, failRate: 9.5, bomQty: 1, monthlyBase: 241, peakMultiplier: 1.35, peak: 325 },
+];
+
+// Historical vs IB-Driven Policy Comparison
+const policyComparison = [
+  { part: 'B-S24-ULTRA at CHI-142', oldMin: 15, oldMax: 35, newMin: 30, newMax: 75, oldCoverage: 11, newCoverage: 24.6, impact: 'Reduced stockouts from 3-4x/month to 0-1x/month' },
+  { part: 'B-A54 at NY-045', oldMin: 20, oldMax: 45, newMin: 45, newMax: 95, oldCoverage: 15, newCoverage: 28.3, impact: 'Eliminated peak season stockouts' },
+  { part: 'B-M34 at MIA-301', oldMin: 10, oldMax: 25, newMin: 20, newMax: 55, oldCoverage: 8, newCoverage: 21.8, impact: 'Improved SLA from 72% to 89%' },
+];
+
 const techLoadData = [
   { tech: 'Marcus T.', active: 8, load: 92, store: 'CHI-142' },
   { tech: 'Priya S.', active: 12, load: 78, store: 'NY-045' },
@@ -200,6 +279,71 @@ const ChartTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+// ─── SMART TELEMETRY RENDERER ────────────────────────────────────────────────
+function getTelemetryCards(t) {
+  const cards = [];
+  const d = t.diagnostics || {};
+  const hw = t.hardware || t.hardwareFold || {};
+  const sw = t.softwareAnalysis || t.software || {};
+  const usage = t.usagePatterns || {};
+  const analysis = t.analysisAndDecision || {};
+  const usb = t.usbConnectorAnalysis || {};
+
+  // Screen / display
+  if (d.screenHealth !== undefined)
+    cards.push({ label: 'Screen Health', value: `${d.screenHealth}%`, status: d.screenHealth >= 80 ? 'ok' : d.screenHealth >= 50 ? 'warn' : 'crit' });
+  if (d.touchPanel)
+    cards.push({ label: 'Touch Panel', value: d.touchPanel, status: d.touchPanel === 'OFFLINE' ? 'crit' : 'ok' });
+  if (d.deadPixels !== undefined && d.deadPixels !== false)
+    cards.push({ label: 'Dead Pixels', value: d.deadPixels === 'ALL' ? 'All pixels' : `${d.deadPixels} pixels`, status: 'crit' });
+  if (d.panelTemperature !== undefined)
+    cards.push({ label: 'Panel Temp', value: `${d.panelTemperature}°C`, status: d.panelTemperature > 60 ? 'crit' : d.panelTemperature > 45 ? 'warn' : 'ok' });
+
+  // Battery
+  if (d.batteryHealth !== undefined)
+    cards.push({ label: 'Battery Health', value: `${d.batteryHealth}%`, status: d.batteryHealth >= 80 ? 'ok' : d.batteryHealth >= 60 ? 'warn' : 'crit' });
+  if (d.swellingDetected)
+    cards.push({ label: 'Swelling', value: `${d.swellingPercentage}% expansion`, status: 'crit' });
+  if (d.chargeVoltage !== undefined && d.chargeVoltage === 0)
+    cards.push({ label: 'Charge Detect', value: 'Not detected', status: 'crit' });
+
+  // USB / Port
+  if (usb.connectorWear)
+    cards.push({ label: 'Port Wear', value: usb.connectorWear, status: usb.connectorWear === 'HIGH' ? 'crit' : 'warn' });
+  if (usb.contactResistance)
+    cards.push({ label: 'Contact Resistance', value: usb.contactResistance, status: 'crit' });
+
+  // Hardware impact / drop
+  if (hw.lastImpact)
+    cards.push({ label: 'Impact Force', value: `${hw.lastImpact}G`, status: 'crit' });
+  if (hw.dropDetection)
+    cards.push({ label: 'Drop Detected', value: hw.fallHeight || 'Yes', status: 'crit' });
+  if (hw.hinge_cycles)
+    cards.push({ label: 'Hinge Cycles', value: hw.hinge_cycles.toLocaleString(), status: hw.hinge_cycles > 7000 ? 'warn' : 'ok' });
+
+  // Software / OS
+  if (d.osHealth && d.osHealth !== 'PERFECT')
+    cards.push({ label: 'OS Health', value: d.osHealth, status: 'crit' });
+  if (d.ramTest && d.ramTest !== 'OK')
+    cards.push({ label: 'RAM Test', value: d.ramTest, status: 'crit' });
+  if (sw.lastOsUpdate)
+    cards.push({ label: 'Last OS Update', value: sw.lastOsUpdate, status: sw.updateIssue ? 'warn' : 'ok' });
+
+  // Usage
+  if (usage.chargeCount !== undefined)
+    cards.push({ label: 'Charge Cycles', value: `${usage.chargeCount}`, status: usage.chargeCount > 500 ? 'warn' : 'ok' });
+
+  // Analysis
+  if (analysis.probabilityHardwareFailure)
+    cards.push({ label: 'HW Failure Prob.', value: analysis.probabilityHardwareFailure, status: parseInt(analysis.probabilityHardwareFailure) >= 80 ? 'crit' : parseInt(analysis.probabilityHardwareFailure) >= 50 ? 'warn' : 'ok' });
+  if (analysis.estimatedRepairTime || analysis.estRepairTime)
+    cards.push({ label: 'Est. Repair', value: analysis.estimatedRepairTime || analysis.estRepairTime, status: 'neutral' });
+  if (analysis.partCost)
+    cards.push({ label: 'Part Cost', value: analysis.partCost, status: 'neutral' });
+
+  return cards.slice(0, 6); // max 6 cards
+}
+
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function ReservationQueue({ model }) {
   const [activeTab, setActiveTab] = useState('live');
@@ -212,9 +356,102 @@ export default function ReservationQueue({ model }) {
   const [perfPartnerFilter, setPerfPartnerFilter] = useState('All Partners');
   const [contextOpen, setContextOpen] = useState(false);
 
+  // ─── ANALYTICS REACTIVE LAYER ──────────────────────────────────────────────
   const isToBe = model === 'TO_BE';
   const qStats = oemMetrics[model].queueStats;
   const currentReqs = liveRequests[model];
+
+  // Derived Performance KPIs
+  const filteredKpis = useMemo(() => {
+    let base = [
+      { label: 'Total Repairs MTD', value: 419, sub: 'Jan–Apr 2026', trend: '+14%', color: 'indigo', icon: Wrench },
+      { label: 'FTFR Rate', value: 87, sub: 'vs 83% Jan baseline', trend: '+4pp', color: 'emerald', icon: CheckCircle2 },
+      { label: 'Avg Resolution', value: 2.8, sub: 'down from 3.8h Jan', trend: '-28%', color: 'blue', icon: Clock },
+      { label: 'Repeat Repair Rate', value: 8.2, sub: 'returned cases', trend: '-2.1pp', color: 'amber', icon: RefreshCw },
+      { label: 'Delayed Repairs', value: 70, sub: 'of 419 total cases', trend: '-12%', color: 'red', icon: AlertTriangle },
+    ];
+
+    if (perfPartnerFilter !== 'All Partners' || perfModelFilter !== 'All') {
+      // Simulate filtering effects
+      const mult = perfPartnerFilter !== 'All Partners' ? 0.15 : 1;
+      const modelMult = perfModelFilter !== 'All' ? 0.3 : 1;
+      const combined = mult * modelMult;
+
+      return base.map(k => {
+        if (k.label.includes('Total') || k.label.includes('Delayed')) {
+          return { ...k, value: Math.round(k.value * combined) };
+        }
+        if (k.label.includes('FTFR') && perfModelFilter !== 'All') {
+          // Model specific FTFR variation
+          const offset = perfModelFilter === 'S24 Ultra' ? -3 : 2;
+          return { ...k, value: k.value + offset };
+        }
+        return k;
+      });
+    }
+    return base;
+  }, [perfModelFilter, perfPartnerFilter]);
+
+  // Derived Historical Trend
+  const filteredTrend = useMemo(() => {
+    if (perfPartnerFilter === 'All Partners' && perfModelFilter === 'All') return historicalRepairData;
+    const mult = perfPartnerFilter !== 'All Partners' ? 0.18 : (perfModelFilter !== 'All' ? 0.35 : 1);
+    return historicalRepairData.map(d => ({
+      ...d,
+      volume: Math.round(d.volume * mult),
+      resolved: Math.round(d.resolved * mult),
+      escalated: Math.round(d.escalated * mult),
+    }));
+  }, [perfModelFilter, perfPartnerFilter]);
+
+  // Derived ftfrByModel
+  const filteredFtfrByModel = useMemo(() => {
+    if (perfModelFilter === 'All') return ftfrByModelData;
+    return ftfrByModelData.map(d => ({
+      month: d.month,
+      [perfModelFilter]: d[perfModelFilter]
+    }));
+  }, [perfModelFilter]);
+
+  // Derived Hotspots
+  const filteredHotspots = useMemo(() => {
+    if (perfPartnerFilter === 'All Partners') return hotspotData;
+    return hotspotData.filter(h => h.id.includes(perfPartnerFilter.split('-')[1]) || h.name.includes(perfPartnerFilter.split('-')[0]));
+  }, [perfPartnerFilter]);
+
+  // Derived RCA
+  const filteredRca = useMemo(() => {
+    if (perfModelFilter === 'All' && perfPartnerFilter === 'All Partners') return rcaDelayData;
+    const mult = perfPartnerFilter !== 'All Partners' ? 0.2 : (perfModelFilter !== 'All' ? 0.4 : 1);
+    return rcaDelayData.map(d => ({
+      ...d,
+      count: Math.round(d.count * mult) || 1
+    }));
+  }, [perfModelFilter, perfPartnerFilter]);
+
+  // Derived Partner Performance
+  const filteredPartnerPerf = useMemo(() => {
+    if (perfPartnerFilter === 'All Partners') return partnerPerformanceData;
+    return partnerPerformanceData.filter(p => p.id.includes(perfPartnerFilter.split('-')[1]) || p.name.includes(perfPartnerFilter.split('-')[0]));
+  }, [perfPartnerFilter]);
+
+  // Derived Tech Load
+  const filteredTechLoad = useMemo(() => {
+    if (perfPartnerFilter === 'All Partners') return techLoadData;
+    const pid = perfPartnerFilter.split('-')[1];
+    return techLoadData.filter(t => t.store.includes(pid));
+  }, [perfPartnerFilter]);
+
+  // Derived Delay Buckets
+  const filteredDelayBuckets = useMemo(() => {
+    if (perfModelFilter === 'All' && perfPartnerFilter === 'All Partners') return delayBucketData;
+    const mult = perfPartnerFilter !== 'All Partners' ? 0.25 : (perfModelFilter !== 'All' ? 0.45 : 1);
+    return delayBucketData.map(d => ({
+      ...d,
+      value: Math.round(d.value * mult) || 1
+    }));
+  }, [perfModelFilter, perfPartnerFilter]);
+
   const activeReq = currentReqs.find(r => r.id === activeReqId) || currentReqs[0];
 
   const showToast = (msg) => {
@@ -238,32 +475,30 @@ export default function ReservationQueue({ model }) {
   const histStatusColor = { RESOLVED: 'bg-emerald-50 text-emerald-700', RESCHEDULED: 'bg-amber-50 text-amber-700', ESCALATED: 'bg-red-50 text-red-700' };
 
   return (
-    <div className="flex flex-col h-full bg-[#F9FAFB] max-w-[1440px] mx-auto w-full animate-in fade-in duration-500 relative pb-10">
+    <div className="flex flex-col h-full bg-slate-50 max-w-[1536px] mx-auto w-full animate-in fade-in duration-500 relative pb-10">
       {/* TOAST */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-50 animate-in slide-in-from-bottom-4">
-          <CheckCircle2 size={18} className="text-emerald-400" />
-          <span className="text-sm font-bold">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-4 py-2 border border-slate-700 rounded-sm shadow-lg flex items-center gap-3 z-50 animate-in slide-in-from-bottom-4">
+          <CheckCircle2 size={16} className="text-emerald-400" />
+          <span className="text-xs font-bold">{toastMessage}</span>
         </div>
       )}
-
-      {/* ── HEADER ── */}
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-start mb-5 px-1">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <div className="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200">
-              <Inbox className="text-white" size={20} />
-            </div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Repair Reservation <span className="text-indigo-600">Hub</span></h2>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <Inbox className="text-blue-700" size={24} /> 
+              Repair Reservation <span className="text-blue-700">Workbench</span>
+            </h2>
           </div>
-          <p className="text-sm font-semibold text-gray-400 ml-12">End-to-end repair lifecycle management · Performance intelligence · Demand planning.</p>
+          <p className="text-xs font-medium text-slate-500">Comprehensive repair operations management, performance intelligence, and demand forecasting.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm">
-            <Download size={14} /> Export
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-slate-300 bg-white text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all">
+            <Download size={14} /> EXPORT
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm">
-            <RefreshCw size={14} /> Refresh
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-slate-300 bg-white text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all">
+            <RefreshCw size={14} /> REFRESH
           </button>
         </div>
       </div>
@@ -296,17 +531,17 @@ export default function ReservationQueue({ model }) {
       </div>
 
       {/* ── TABS ── */}
-      <div className="flex gap-2 mb-5 border-b border-gray-200 pb-0">
+      <div className="flex gap-4 mb-5 border-b border-slate-200">
         {[
           { id: 'live', label: 'Live Queue', icon: Inbox },
           { id: 'history', label: 'Request History', icon: History },
-          { id: 'performance', label: 'Repair Performance Mgt', icon: BarChart3 },
+          { id: 'performance', label: 'Performance Management', icon: BarChart3 },
           ...(isToBe ? [{ id: 'planning', label: 'Demand Planning', icon: Layers }] : []),
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === tab.id ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-400 hover:text-gray-700'}`}
+            className={`flex items-center gap-2 px-1 py-2 text-[11px] font-bold uppercase tracking-wider border-b-[3px] transition-all ${activeTab === tab.id ? 'border-blue-700 text-blue-800' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
           >
             <tab.icon size={14} /> {tab.label}
           </button>
@@ -317,228 +552,389 @@ export default function ReservationQueue({ model }) {
           TAB: LIVE QUEUE
       ═══════════════════════════════════════════════════ */}
       {activeTab === 'live' && (
-        <div className="flex gap-5 flex-1 overflow-hidden min-h-[600px]">
-          {/* LEFT: Request List */}
-          <div className="w-[38%] bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-hidden flex-shrink-0">
+        <div className="space-y-4 flex-1 overflow-hidden flex flex-col min-h-[600px]">
+          {/* MAIN CONTENT: 65/35 SPLIT */}
+          <div className="flex gap-4 flex-1 overflow-hidden">
+            {/* LEFT: Request List (65%) */}
+            <div className="w-[48%] bg-white border border-slate-200 rounded-sm shadow-sm flex flex-col overflow-hidden flex-shrink-0">
             {/* Search & Filter */}
-            <div className="p-3 border-b border-gray-100 bg-gray-50/50 space-y-2 flex-shrink-0">
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <div className="p-3 border-b border-slate-200 bg-slate-50 flex items-center gap-3 flex-shrink-0">
+              <div className="relative flex-1">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search by ID, device, customer..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 text-xs font-semibold bg-white border border-gray-200 rounded-xl outline-none focus:border-indigo-400 transition-colors"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs font-medium bg-white border border-slate-300 rounded-sm outline-none focus:border-blue-600 transition-colors"
                 />
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1">
                 {['All', 'Ready', 'Needs Action'].map(f => (
-                  <button key={f} onClick={() => setReqFilter(f)} className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all ${reqFilter === f ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>
+                  <button key={f} onClick={() => setReqFilter(f)} className={`px-4 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-wider border transition-all ${reqFilter === f ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-500 border-slate-300 hover:border-blue-400'}`}>
                     {f}
                   </button>
                 ))}
               </div>
             </div>
             {/* List */}
-            <div className="overflow-y-auto flex-1 p-2 space-y-1.5">
+            <div className="overflow-y-auto flex-1 space-y-0.5 h-full">
               {filteredLive.map(req => (
                 <div
                   key={req.id}
                   onClick={() => setActiveReqId(req.id)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all group ${activeReqId === req.id ? 'bg-indigo-50 border-indigo-200 shadow-sm' : 'bg-white border-gray-100 hover:border-indigo-100 hover:shadow-sm'}`}
-                  style={{ borderLeftWidth: '3px', borderLeftColor: statusColor[req.status] }}
+                  className={`px-4 py-3.5 border-b border-slate-100 cursor-pointer transition-all ${activeReqId === req.id ? 'bg-slate-100 border-l-[4px] border-l-blue-700' : 'bg-white border-l-[4px] border-l-transparent hover:bg-slate-50'}`}
                 >
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className={`font-black text-[11px] ${activeReqId === req.id ? 'text-indigo-700' : 'text-gray-800'}`}>{req.id} · {req.issueShort}</span>
+                    <span className={`font-bold text-[12px] uppercase tracking-tight ${activeReqId === req.id ? 'text-blue-800' : 'text-slate-800'}`}>{req.id} · {req.issueShort}</span>
                     <div className="flex items-center gap-2">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${priorityColor[req.priority]}`}>{req.priority}</span>
-                      <span className="text-[10px] font-bold text-gray-400 flex items-center gap-0.5"><Clock size={10}/>{req.time}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase ${priorityColor[req.priority]}`}>{req.priority}</span>
+                      <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1"><Clock size={11}/>{req.time}</span>
                     </div>
                   </div>
-                  <div className="text-xs font-bold text-gray-800 truncate mb-0.5">{req.device}</div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] text-gray-500 flex items-center gap-1 font-semibold"><MapPin size={10} className="text-gray-400"/>{req.store.split('(')[0].trim()}</div>
-                    <div className="text-[10px] text-gray-400 flex items-center gap-1"><User size={10}/>{req.technician}</div>
+                  <div className="text-[12px] font-bold text-slate-600 flex items-center justify-between">
+                    <span>{req.device}</span>
+                    <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1"><User size={11} className="text-slate-300"/>{req.technician}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* RIGHT: Request Detail */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col overflow-y-auto">
+          {/* RIGHT: Request Detail (35%) */}
+          <div className="w-[52%] flex-shrink-0 bg-white border border-slate-200 rounded-sm shadow-sm flex flex-col overflow-hidden">
             {!activeReq ? (
-              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm font-semibold">Select a request to view details</div>
+              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm font-semibold">Select a request to view details</div>
             ) : (
-              <div className="p-6 space-y-5">
-                {/* Detail Header */}
-                <div className="flex justify-between items-start pb-4 border-b border-gray-100">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-black text-gray-900">{activeReq.id}</h3>
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${priorityColor[activeReq.priority]}`}>{activeReq.priority}</span>
-                    </div>
-                    <p className="text-sm font-semibold text-gray-500">{activeReq.device} · {activeReq.warranty}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: statusColor[activeReq.status] }}></div>
-                    <span className="text-xs font-black text-gray-600 uppercase tracking-wide">{activeReq.status === 'GREEN' ? 'Part Ready' : activeReq.status === 'AMBER' ? 'Needs Redirect' : 'Stockout'}</span>
-                  </div>
-                </div>
-
-                {/* Info Grid */}
-                <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
-                  <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-4 flex items-center gap-1.5"><Wrench size={12}/> Request Details</h4>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Request ID</span><span className="font-bold text-gray-900">{activeReq.id}</span></div>
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Customer ID</span><span className="font-bold text-gray-900">{activeReq.customer}</span></div>
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Assigned Technician</span><span className="font-bold text-gray-900">{activeReq.technician}</span></div>
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Preferred Store</span><span className="font-bold text-gray-900 flex items-center gap-1"><MapPin size={12} className="text-indigo-600"/>{activeReq.store}</span></div>
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Reservation Date</span><span className="font-bold text-gray-900">{activeReq.date}</span></div>
-                    <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Warranty Status</span><span className={`font-bold text-xs px-2 py-0.5 rounded-full inline-block ${activeReq.warranty === 'In Warranty' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>{activeReq.warranty}</span></div>
-                    <div className="col-span-2 pt-3 border-t border-gray-200">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1.5">Tentative Part Number(s)</span>
-                      <div className="flex flex-wrap gap-2">
-                        {activeReq.tentativeParts.map((p, i) => (
-                          <span key={i} className="bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-black px-3 py-1 rounded-lg flex items-center gap-1.5">
-                            <Package size={10}/> {p}
-                          </span>
-                        ))}
+              <div className="flex flex-col h-full overflow-hidden">
+                <div className="flex-1 overflow-y-auto px-4 pr-4 py-4 space-y-4">
+                  {/* HEADER */}
+                  <div className="border-b border-slate-200 pb-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="text-[9px] text-blue-600 font-bold uppercase tracking-widest mb-1">{activeReq.id} · ACTIVE REQUEST</div>
+                        <div className="text-[15px] font-extrabold text-slate-900 leading-tight">{activeReq.device}</div>
+                        <div className="text-[11px] text-slate-500 mt-1 italic">"{activeReq.issueShort}"</div>
                       </div>
+                      <span className={`flex-shrink-0 px-2.5 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${activeReq.status === 'GREEN' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : activeReq.status === 'AMBER' ? 'bg-amber-50 text-amber-700 border-amber-300' : 'bg-red-50 text-red-700 border-red-300'}`}>
+                        {activeReq.status === 'GREEN' ? 'READY TO PEG' : activeReq.status === 'AMBER' ? 'REVIEW' : 'CRITICAL'}
+                      </span>
                     </div>
-                    <div className="col-span-2"><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Issue Reported</span><span className="font-semibold text-gray-700 text-sm leading-relaxed">{activeReq.issue}</span></div>
                   </div>
-                </div>
 
-                {/* Status Action Panel */}
-                {activeReq.status === 'GREEN' && (
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 p-5 rounded-2xl flex flex-col items-center text-center animate-in fade-in zoom-in-95">
-                    <CheckCircle2 size={36} className="text-emerald-600 mb-3" />
-                    <h3 className="text-base font-black text-emerald-900 mb-1">Part Available at Preferred Store</h3>
-                    <p className="text-xs text-emerald-700 font-semibold mb-5">Stock confirmed: 12 units · Safety Threshold: 5 units</p>
-                    <div className="flex gap-3">
-                      <button onClick={() => showToast(`✅ Reservation ${activeReq.id} Approved`)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl shadow-md shadow-emerald-200 transition-all text-sm">
-                        Approve Reservation
-                      </button>
-                      <button onClick={() => showToast('Assigned to next technician slot')} className="bg-white border border-emerald-200 hover:border-emerald-400 text-emerald-700 font-bold py-2.5 px-4 rounded-xl text-sm transition-all">
-                        Assign Slot
-                      </button>
-                    </div>
-                    {isToBe && <p className="text-[10px] text-emerald-600 font-bold mt-4 flex items-center gap-1"><Zap size={10}/> AI pre-stocked this location ahead of MTBF demand wave.</p>}
+                  {/* CUSTOMER & DEVICE INFO - Grid Layout */}
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+                    {[
+                      { label: 'Customer', value: activeReq.customer, color: 'text-slate-800' },
+                      { label: 'Model', value: activeReq.device.split(' ')[0], color: 'text-slate-800' },
+                      { label: 'Device Age', value: `${activeReq.age} months`, color: 'text-slate-800' },
+                      { label: 'Entitlement', value: activeReq.warranty === 'In Warranty' ? 'GalaxyCare+' : 'Out of Warranty', color: activeReq.warranty === 'In Warranty' ? 'text-blue-700' : 'text-slate-600' },
+                    ].map(({ label, value, color }) => (
+                      <div key={label} className="bg-slate-50 border border-slate-200 rounded px-2.5 py-2">
+                        <div className="text-[9px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">{label}</div>
+                        <div className={`text-[11px] font-bold ${color}`}>{value}</div>
+                      </div>
+                    ))}
                   </div>
-                )}
 
-                {activeReq.status === 'AMBER' && isToBe && (
-                  <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl animate-in fade-in zoom-in-95">
-                    <div className="flex flex-col items-center text-center mb-4">
-                      <AlertTriangle size={32} className="text-amber-500 mb-2" />
-                      <h3 className="font-black text-amber-900">Preferred Store Out of Stock</h3>
-                      <p className="text-xs text-amber-700 font-semibold mt-1">Alternate locations identified automatically.</p>
+                  {/* SMART TELEMETRY PANEL */}
+                  {(requestTelemetry[activeReq.id] || requestTelemetry[activeReq.id.replace(/2026041\d/, '20260409')]) && (() => {
+                    const t = requestTelemetry[activeReq.id] || requestTelemetry[activeReq.id.replace(/2026041\d/, '20260409')];
+                    const analysis = t.analysisAndDecision || {};
+                    const cards = getTelemetryCards(t);
+                    const isCritical = parseInt(analysis.probabilityHardwareFailure) >= 80;
+                    const statusColor = isCritical ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50';
+                    const labelColor = isCritical ? 'text-red-600' : 'text-amber-600';
+                    return (
+                      <div className={`border rounded overflow-hidden ${statusColor}`}>
+                        {/* Header */}
+                        <div className={`px-3 py-2 border-b ${isCritical ? 'border-red-200 bg-red-100/60' : 'border-amber-200 bg-amber-100/60'} flex items-center justify-between`}>
+                          <div className={`text-[9px] font-bold uppercase tracking-widest ${labelColor} flex items-center gap-1.5`}>
+                            {isCritical ? '⚠️' : '🔍'} Device Diagnostics
+                          </div>
+                          <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded ${isCritical ? 'bg-red-200 text-red-700' : 'bg-amber-200 text-amber-700'}`}>
+                            {analysis.softFixApplicable === true ? 'Soft Fix Possible' : analysis.softFixApplicable === false ? 'Hardware Required' : 'Mixed'}
+                          </span>
+                        </div>
+
+                        {/* Metric cards grid */}
+                        {cards.length > 0 && (
+                          <div className="grid grid-cols-2 gap-px bg-slate-200 border-b border-slate-200">
+                            {cards.map(({ label, value, status }) => {
+                              const valColor = status === 'crit' ? 'text-red-700' : status === 'warn' ? 'text-amber-700' : status === 'ok' ? 'text-emerald-700' : 'text-slate-700';
+                              return (
+                                <div key={label} className="bg-white px-2.5 py-2">
+                                  <div className="text-[8px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">{label}</div>
+                                  <div className={`text-[11px] font-bold ${valColor} leading-tight`}>{value}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Root cause + repair path */}
+                        <div className="px-3 py-2.5 space-y-2">
+                          {analysis.primaryCause && (
+                            <div>
+                              <div className="text-[8px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Root Cause</div>
+                              <div className={`text-[10px] font-semibold ${isCritical ? 'text-red-800' : 'text-amber-800'} leading-snug`}>{analysis.primaryCause}</div>
+                            </div>
+                          )}
+                          {analysis.secondaryCause && (
+                            <div>
+                              <div className="text-[8px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Secondary Factor</div>
+                              <div className="text-[9px] text-slate-600 leading-snug">{analysis.secondaryCause}</div>
+                            </div>
+                          )}
+                          {analysis.details && (
+                            <div>
+                              <div className="text-[8px] text-slate-400 font-semibold uppercase tracking-wide mb-1">Findings</div>
+                              <div className="space-y-0.5">
+                                {(Array.isArray(analysis.details) ? analysis.details : [analysis.details]).map((d, i) => (
+                                  <div key={i} className="flex gap-1.5 text-[9px] text-slate-600 leading-snug">
+                                    <span className="text-slate-400 flex-shrink-0">·</span><span>{d}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* Repair strategy steps if present */}
+                          {analysis.repairStrategy && (
+                            <div>
+                              <div className="text-[8px] text-slate-400 font-semibold uppercase tracking-wide mb-1">Repair Path</div>
+                              <div className="space-y-1">
+                                {analysis.repairStrategy.map((s) => (
+                                  <div key={s.step} className="flex gap-2 text-[9px] leading-snug">
+                                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-[8px]">{s.step}</span>
+                                    <div>
+                                      <span className="font-semibold text-slate-700">{s.action}</span>
+                                      {s.success_rate && <span className="text-slate-400 ml-1">({s.success_rate} success)</span>}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {analysis.warrantyStatus && (
+                            <div className={`text-[9px] font-semibold px-2 py-1 rounded ${analysis.warrantyStatus.includes('IN WARRANTY') ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                              {analysis.warrantyStatus.includes('IN WARRANTY') ? '🛡️' : '💳'} {analysis.warrantyStatus}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* AI PART PREDICTION TABLE */}
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="text-slate-400">📋</span> AI Part Prediction <span className="text-slate-400 font-normal normal-case tracking-normal">(Symptom → Parts)</span>
                     </div>
-                    <div className="bg-white rounded-xl border border-amber-100 overflow-hidden mb-4">
-                      <table className="w-full text-xs text-left">
-                        <thead className="bg-amber-50 border-b border-amber-100">
-                          <tr><th className="p-3 text-amber-900 font-black">Alternative Store</th><th className="p-3 text-amber-900 font-black">Distance</th><th className="p-3 text-amber-900 font-black text-right">Stock</th></tr>
+                    <div className="border border-slate-200 rounded overflow-hidden">
+                      <table className="w-full text-[10px]">
+                        <thead className="bg-slate-100 border-b border-slate-200">
+                          <tr className="text-slate-500 font-bold uppercase tracking-wide">
+                            <th className="px-2.5 py-2 text-left">Part SKU</th>
+                            <th className="px-2.5 py-2 text-left">Description</th>
+                            <th className="px-2.5 py-2 text-center">Prob.</th>
+                            <th className="px-2.5 py-2 text-center">QTY</th>
+                          </tr>
                         </thead>
-                        <tbody>
-                          <tr className="border-b border-gray-100 hover:bg-amber-50/30 transition-colors"><td className="p-3 font-bold text-gray-800">Store #187 (Naperville)</td><td className="p-3 text-gray-500">8.2 mi</td><td className="p-3 font-black text-emerald-600 text-right">4 units</td></tr>
-                          <tr className="hover:bg-amber-50/30 transition-colors"><td className="p-3 font-bold text-gray-800">Store #210 (Schaumburg)</td><td className="p-3 text-gray-500">14.1 mi</td><td className="p-3 font-black text-emerald-600 text-right">11 units</td></tr>
+                        <tbody className="divide-y divide-slate-100 bg-white">
+                          {activeReq.tentativeParts?.map((part, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                              <td className="px-2.5 py-2 font-bold text-blue-700">{part.split(' - ')[0]}</td>
+                              <td className="px-2.5 py-2 text-slate-600">{part.split(' - ')[1]}</td>
+                              <td className="px-2.5 py-2 text-center font-bold text-emerald-600">92%</td>
+                              <td className="px-2.5 py-2 text-center text-slate-600">1</td>
+                            </tr>
+                          ))}
+                          <tr className="hover:bg-slate-50 bg-slate-50/50">
+                            <td className="px-2.5 py-2 font-bold text-slate-500">ADH-GEN-K</td>
+                            <td className="px-2.5 py-2 text-slate-500">Adhesive Kit (generic)</td>
+                            <td className="px-2.5 py-2 text-center font-bold text-emerald-600">92%</td>
+                            <td className="px-2.5 py-2 text-center text-slate-500">1</td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
-                    <div className="flex gap-3 justify-center">
-                      <button onClick={() => showToast('Redirected to Store #187')} className="bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 px-5 rounded-xl shadow-md transition-all text-sm">Redirect → #187</button>
-                      <button onClick={() => showToast('Rescheduled for restock')} className="bg-white border border-amber-200 text-amber-700 font-bold py-2.5 px-5 rounded-xl text-sm transition-all hover:border-amber-400">Schedule Wait</button>
-                    </div>
                   </div>
-                )}
 
-                {activeReq.status === 'AMBER' && !isToBe && (
-                  <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col items-center text-center animate-in fade-in zoom-in-95">
-                    <AlertTriangle size={32} className="text-amber-500 mb-2" />
-                    <h3 className="font-black text-amber-900 mb-1">Local Stock-Out · No Network Visibility</h3>
-                    <div className="bg-white w-full p-4 rounded-xl border border-amber-200 my-4 flex flex-col items-center gap-2">
-                      <Phone size={24} className="text-gray-400" />
-                      <p className="text-xs font-semibold text-gray-600">Manager must manually call nearby stores to locate inventory.</p>
-                    </div>
-                    <button onClick={() => showToast('Rescheduled for Apr 10')} className="bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 px-6 rounded-xl shadow-md transition-all text-sm">Reschedule to Apr 10</button>
-                  </div>
-                )}
+                  {/* PARTNER CAPACITY EVALUATION */}
+                  {(() => {
+                    const storeNumMatch = activeReq.store.match(/#(\d+)/);
+                    const storeNum = storeNumMatch ? storeNumMatch[1] : null;
+                    const primary = partnerPerformanceData.find(p => p.id === `P-${storeNum}`) || partnerPerformanceData[0];
+                    const alt = partnerPerformanceData.filter(p => p.id !== primary.id).sort((a, b) => a.slaCompliance - b.slaCompliance)[0];
+                    const partSku = activeReq.tentativeParts?.[0]?.split(' - ')[0] || '';
+                    const partDesc = activeReq.tentativeParts?.[0]?.split(' - ')[1] || '';
+                    const partInv = topDelayedPartsData.find(p => p.sku === partSku);
+                    const primaryStock = partInv ? partInv.maxStock : 45;
+                    const altStock = partInv ? partInv.minStock : 8;
+                    const warehouseStock = primaryStock * 40;
+                    return (
+                      <>
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <span className="text-slate-400">📍</span> Partner Capacity Evaluation
+                          </div>
+                          <div className="space-y-2">
+                            {/* Primary */}
+                            <div className="p-3 border-2 border-emerald-300 bg-emerald-50 rounded">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div className="min-w-0">
+                                  <div className="text-[11px] font-bold text-slate-800 leading-tight">{primary.name} — {primary.city}</div>
+                                  <div className="text-[9px] text-slate-500 mt-1 leading-relaxed">
+                                    {primary.region} · {primary.tier} Partner<br/>
+                                    Avg resolution: {primary.avgResTime}h · FTFR: {primary.ftfr}%
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end flex-shrink-0">
+                                  <div className="text-2xl font-black text-emerald-700 leading-none">{primary.slaCompliance}</div>
+                                  <div className="text-[8px] text-emerald-600 font-bold tracking-wider mt-0.5">SLA %</div>
+                                </div>
+                              </div>
+                              <div className="text-[9px] text-emerald-700 font-bold uppercase tracking-wide flex items-center gap-1">
+                                <span>✓</span> RECOMMENDED · {activeReq.store}
+                              </div>
+                            </div>
+                            {/* Alt */}
+                            <div className="p-3 border border-slate-200 bg-slate-50 rounded opacity-70">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div className="min-w-0">
+                                  <div className="text-[11px] font-bold text-slate-600 leading-tight">{alt.name} — {alt.city}</div>
+                                  <div className="text-[9px] text-slate-500 mt-1 leading-relaxed">
+                                    {alt.region} · {alt.tier} Partner<br/>
+                                    {alt.delayedCases} delayed cases · Avg res: {alt.avgResTime}h
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end flex-shrink-0">
+                                  <div className="text-2xl font-black text-slate-400 leading-none">{alt.slaCompliance}</div>
+                                  <div className="text-[8px] text-slate-400 font-bold tracking-wider mt-0.5">SLA %</div>
+                                </div>
+                              </div>
+                              <div className="text-[9px] text-slate-400 uppercase tracking-wide font-semibold">NOT RECOMMENDED</div>
+                            </div>
+                          </div>
+                        </div>
 
-                {activeReq.status === 'RED' && (
-                  <div className="bg-red-50 border border-red-200 p-5 rounded-2xl flex flex-col items-center text-center animate-in fade-in zoom-in-95">
-                    <XCircle size={32} className="text-red-500 mb-2" />
-                    <h3 className="font-black text-red-900 mb-1">Regional Stock-Out</h3>
-                    <p className="text-xs text-red-700 font-semibold mb-1">No viable stock within 25-mile radius.</p>
-                    <span className="text-[10px] text-red-700 font-black bg-red-100 px-3 py-1 rounded-full uppercase tracking-wider mb-5">ETA: Apr 9 (5 days)</span>
-                    <div className="flex gap-3">
-                      <button onClick={() => showToast('Rescheduled to Apr 10')} className="bg-red-600 hover:bg-red-700 text-white font-black py-2.5 px-5 rounded-xl shadow-md transition-all text-sm">Reschedule → Apr 10</button>
-                      <button onClick={() => showToast('Escalated to Supply Chain')} className="bg-white border border-red-200 text-red-700 font-bold py-2.5 px-5 rounded-xl text-sm hover:border-red-400 transition-all">Escalate</button>
-                    </div>
-                  </div>
-                )}
+                        {/* INVENTORY AVAILABILITY */}
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <span className="text-slate-400">📦</span> Inventory — <span className="font-bold text-blue-700">{partSku}</span><span className="text-slate-400 font-normal"> {partDesc}</span>
+                          </div>
+                          <div className="space-y-2.5">
+                            {[
+                              { label: `${primary.name} (${primary.city})`, units: `${primaryStock} units`, pct: `${Math.min(100, Math.round(primaryStock / (partInv?.maxStock || primaryStock) * 100))}%`, color: 'bg-emerald-500', textColor: 'text-emerald-700' },
+                              { label: `${alt.name} (${alt.city})`, units: `${altStock} units`, pct: `${Math.min(100, Math.round(altStock / (partInv?.maxStock || primaryStock) * 100))}%`, color: altStock < 12 ? 'bg-red-500' : 'bg-amber-400', textColor: altStock < 12 ? 'text-red-600' : 'text-amber-700' },
+                              { label: 'Warehouse (Central)', units: `${warehouseStock.toLocaleString()} units`, pct: '100%', color: 'bg-emerald-500', textColor: 'text-emerald-700' },
+                            ].map(({ label, units, pct, color, textColor }) => (
+                              <div key={label}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-semibold text-slate-700">{label}</span>
+                                  <span className={`text-[10px] font-bold ${textColor}`}>{units}</span>
+                                </div>
+                                <div className="w-full bg-slate-200 rounded-full h-1.5">
+                                  <div className={`${color} h-1.5 rounded-full transition-all`} style={{width: pct}}></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                {/* Device Context (Collapsible) */}
-                <div className="border border-gray-200 rounded-2xl overflow-hidden">
-                  <button onClick={() => setContextOpen(!contextOpen)} className="w-full p-4 font-black text-gray-700 text-xs flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors uppercase tracking-widest">
-                    <span className="flex items-center gap-2"><Shield size={12} className="text-indigo-600"/> Device History & Context</span>
-                    <ChevronDown size={14} className={`transition-transform ${contextOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {contextOpen && (
-                    <div className="p-5 border-t border-gray-100 grid grid-cols-2 gap-4 text-sm bg-white">
-                      <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Device Age</span><span className="font-bold text-gray-800">{activeReq.age} months</span></div>
-                      <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Prior Repairs</span><span className="font-bold text-gray-800">0 on record</span></div>
-                      <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Regional Install Base</span><span className="font-bold text-gray-800">12,450 active units</span></div>
-                      <div><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Assigned Slot</span><span className="font-bold text-gray-800">{activeReq.time} · {activeReq.date}</span></div>
-                    </div>
-                  )}
+                        {/* SYSTEM RECOMMENDATION */}
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                          <div className="text-[10px] font-bold text-blue-800 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                            <span>✅</span> System Recommendation
+                          </div>
+                          <div className="space-y-2">
+                            {[
+                              { label: 'Request', value: activeReq.id },
+                              { label: 'Assigned Partner', value: `${primary.name} — ${primary.city}` },
+                              { label: 'Technician', value: activeReq.technician },
+                              { label: 'Appointment', value: `${activeReq.date} · ${activeReq.time}` },
+                            ].map(({ label, value }) => (
+                              <div key={label} className="flex items-start justify-between gap-2">
+                                <span className="text-[9px] font-bold text-blue-400 uppercase tracking-wide whitespace-nowrap">{label}</span>
+                                <span className="text-[10px] text-blue-900 font-semibold text-right">{value}</span>
+                              </div>
+                            ))}
+                            <div className="pt-1 border-t border-blue-200">
+                              <div className="text-[9px] font-bold text-blue-400 uppercase tracking-wide mb-1.5">Pre-Actions</div>
+                              <div className="text-[9px] text-blue-700 space-y-1 leading-relaxed">
+                                <div className="flex gap-1.5"><span className="text-blue-400 flex-shrink-0">•</span><span>Inventory hard-peg: <strong>{partSku}</strong> reserved for {activeReq.id} at {primary.city}</span></div>
+                                <div className="flex gap-1.5"><span className="text-blue-400 flex-shrink-0">•</span><span>Replenishment check: {partDesc} stock at {primary.name}</span></div>
+                                <div className="flex gap-1.5"><span className="text-blue-400 flex-shrink-0">•</span><span>{alt.name} flagged — {alt.delayedCases} delayed cases, rebalancing advised</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
+                {/* ACTION BUTTONS */}
+                <div className="border-t border-slate-200 p-3 bg-slate-50 space-y-2">
+                  <button
+                    onClick={() => showToast(`✅ Confirmed & Pegged ${activeReq.id}`)}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-sm text-xs transition-all uppercase tracking-widest"
+                  >
+                    ✓ Confirm & Peg
+                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-sm text-[10px] hover:bg-slate-100 transition-all uppercase">
+                      Override Partner
+                    </button>
+                    <button className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-sm text-[10px] hover:bg-slate-100 transition-all uppercase">
+                      Escalate
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         </div>
+      </div>
       )}
 
       {/* ═══════════════════════════════════════════════════
           TAB: HISTORY
       ═══════════════════════════════════════════════════ */}
       {activeTab === 'history' && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black text-gray-700 uppercase tracking-widest flex items-center gap-2"><History size={14} className="text-indigo-600"/> Showing last 30 days</h3>
-            <div className="flex gap-2">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2"><History size={14} className="text-blue-700"/> RECENT RESOLUTIONS (30 DAYS)</h3>
+            <div className="flex gap-1">
               {['All', 'RESOLVED', 'RESCHEDULED', 'ESCALATED'].map(f => (
-                <button key={f} onClick={() => setHistoryFilter(f)} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all ${historyFilter === f ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>
+                <button key={f} onClick={() => setHistoryFilter(f)} className={`px-3 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border transition-all ${historyFilter === f ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-300 hover:border-slate-400'}`}>
                   {f === 'All' ? 'All' : f.charAt(0) + f.slice(1).toLowerCase()}
                 </button>
               ))}
             </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
             <table className="w-full text-xs">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  {['Request ID', 'Date', 'Device', 'Part Used', 'Store', 'Technician', 'Resolution Time', 'Outcome', 'Status'].map(h => (
-                    <th key={h} className="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">{h}</th>
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr className="text-slate-400 font-bold uppercase tracking-tight text-[9px]">
+                  {['Request ID', 'Date', 'Device', 'Part Used', 'Store', 'Technician', 'Res. Time', 'Outcome', 'Status'].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-slate-50">
                 {filteredHistory.map((r, i) => (
-                  <tr key={i} className="hover:bg-indigo-50/30 transition-colors group cursor-pointer">
-                    <td className="px-4 py-3 font-black text-indigo-700">{r.id}</td>
-                    <td className="px-4 py-3 font-semibold text-gray-500 flex items-center gap-1"><Calendar size={10}/>{r.date}</td>
-                    <td className="px-4 py-3 font-bold text-gray-800">{r.device}</td>
-                    <td className="px-4 py-3 text-gray-600 font-semibold max-w-[180px] truncate">{r.part}</td>
-                    <td className="px-4 py-3 text-gray-600 font-semibold">{r.store}</td>
-                    <td className="px-4 py-3 text-gray-700 font-bold flex items-center gap-1"><User size={10}/>{r.technician}</td>
-                    <td className="px-4 py-3 font-black text-gray-900">{r.resolution === '--' ? <span className="text-gray-400">—</span> : `${r.resolution}h`}</td>
-                    <td className="px-4 py-3 text-gray-600 font-semibold">{r.outcome}</td>
+                  <tr key={i} className="hover:bg-slate-50 transition-colors group cursor-pointer">
+                    <td className="px-4 py-3 font-bold text-blue-700 uppercase tracking-tighter">{r.id}</td>
+                    <td className="px-4 py-3 font-medium text-slate-500 flex items-center gap-1"><Calendar size={10}/>{r.date}</td>
+                    <td className="px-4 py-3 font-bold text-slate-800">{r.device}</td>
+                    <td className="px-4 py-3 text-slate-600 font-medium max-w-[180px] truncate">{r.part}</td>
+                    <td className="px-4 py-3 text-slate-600 font-medium">{r.store}</td>
+                    <td className="px-4 py-3 text-slate-700 font-bold flex items-center gap-1"><User size={10}/>{r.technician}</td>
+                    <td className="px-4 py-3 font-bold text-slate-900">{r.resolution === '--' ? <span className="text-slate-300">—</span> : `${r.resolution}h`}</td>
+                    <td className="px-4 py-3 text-slate-600 font-medium">{r.outcome}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-[10px] font-black px-2 py-1 rounded-full ${histStatusColor[r.status]}`}>{r.status.charAt(0) + r.status.slice(1).toLowerCase()}</span>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-sm border uppercase tracking-wider ${histStatusColor[r.status].replace('bg-', 'bg-').replace('text-', 'text-')}`}>{r.status}</span>
                     </td>
                   </tr>
                 ))}
@@ -554,212 +950,308 @@ export default function ReservationQueue({ model }) {
         <div className="space-y-5">
 
           {/* GLOBAL FILTER BAR */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2">
-              <Filter size={13} className="text-indigo-600" /> Global Filters
+          <div className="bg-white border border-slate-200 rounded-sm p-3 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-2">
+              <Filter size={12} className="text-blue-700" /> Filter Suite:
             </div>
             {['All', 'S24 Ultra', 'A54', 'M34', 'Z Fold4'].map(m => (
               <button key={m} onClick={() => setPerfModelFilter(m)}
-                className={`px-3 py-1.5 text-[10px] font-black rounded-lg border transition-all ${perfModelFilter === m ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>{m}</button>
+                className={`px-3 py-1 text-[10px] font-bold rounded-sm border transition-all ${perfModelFilter === m ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-500 border-slate-300 hover:border-slate-400'}`}>{m}</button>
             ))}
-            <div className="w-px h-5 bg-gray-200 mx-1" />
+            <div className="w-px h-4 bg-slate-200 mx-1" />
             {['All Partners', 'CHI-142', 'NY-045', 'LA-092', 'MIA-301', 'NAP-187'].map(p => (
               <button key={p} onClick={() => setPerfPartnerFilter(p)}
-                className={`px-3 py-1.5 text-[10px] font-black rounded-lg border transition-all ${perfPartnerFilter === p ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300'}`}>{p}</button>
+                className={`px-3 py-1 text-[10px] font-bold rounded-sm border transition-all ${perfPartnerFilter === p ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-500 border-slate-300 hover:border-slate-400'}`}>{p}</button>
             ))}
-            <div className="ml-auto text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-              Scope: Apr 2026 · {perfPartnerFilter} · {perfModelFilter}
+            <div className="ml-auto text-[9px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-sm border border-slate-200 uppercase">
+              Current Scope: Apr 2026
             </div>
           </div>
 
           {/* PERFORMANCE KPIs */}
-          <div className="grid grid-cols-5 gap-4">
-            {[
-              { label: 'Total Repairs MTD', value: '419', sub: 'Jan–Apr 2026', trend: '+14%', color: 'indigo', icon: Wrench },
-              { label: 'FTFR Rate', value: '87%', sub: 'vs 83% Jan baseline', trend: '+4pp', color: 'emerald', icon: CheckCircle2 },
-              { label: 'Avg Resolution', value: '2.8h', sub: 'down from 3.8h Jan', trend: '-28%', color: 'blue', icon: Clock },
-              { label: 'Repeat Repair Rate', value: '8.2%', sub: 'returned cases', trend: '-2.1pp', color: 'amber', icon: RefreshCw },
-              { label: 'Delayed Repairs', value: '70', sub: 'of 419 total cases', trend: '-12%', color: 'red', icon: AlertTriangle },
-            ].map((kpi, i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:border-indigo-200 transition-all">
-                <div className="flex justify-between items-start mb-3">
-                  <div className={`p-2 rounded-xl bg-${kpi.color}-50`}>
-                    <kpi.icon size={15} className={`text-${kpi.color}-600`} />
+          <div className="grid grid-cols-5 gap-3">
+            {filteredKpis.map((kpi, i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-sm p-4 shadow-sm hover:border-blue-300 transition-all group">
+                <div className="flex justify-between items-start mb-2">
+                  <div className={`p-1.5 rounded-sm bg-slate-50 border border-slate-100`}>
+                    <kpi.icon size={14} className={`text-blue-700`} />
                   </div>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">{kpi.trend}</span>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 border border-emerald-100`}>{kpi.trend}</span>
                 </div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{kpi.label}</p>
-                <p className="text-2xl font-black text-gray-900 mb-0.5">{kpi.value}</p>
-                <p className="text-[9px] text-gray-400 font-semibold">{kpi.sub}</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{kpi.label}</p>
+                <p className="text-xl font-bold text-slate-900 leading-none">{kpi.value}{kpi.label.includes('FTFR') || kpi.label.includes('Rate') ? '%' : kpi.label.includes('Avg') ? 'h' : ''}</p>
+                <div className="mt-2 text-[8px] text-slate-400 font-medium uppercase tracking-tighter">{kpi.sub}</div>
               </div>
             ))}
           </div>
 
           {/* HISTORICAL TRENDS + FTFR BY MODEL */}
-          <div className="grid grid-cols-3 gap-5">
-            <div className="col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <div className="flex justify-between items-start mb-5">
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-8 bg-white border border-slate-200 rounded-sm shadow-sm p-5">
+              <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Historical Performance —</h4>
-                  <p className="text-base font-black text-gray-900">Monthly Repair Volume & Resolution Trends</p>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Repair Volume & Resolution</h4>
+                  <p className="text-sm font-bold text-slate-900">Historical Performance Metrics</p>
                 </div>
-                <div className="flex gap-3 text-[9px] font-black text-gray-400 uppercase">
-                  {[['#6366F1','Volume'],['#10B981','Resolved'],['#F97316','Escalated'],['#F59E0B','FTFR %']].map(([c,l]) => (
-                    <span key={l} className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{background:c}}/>{l}</span>
+                <div className="flex gap-4 text-[8px] font-bold text-slate-400 uppercase">
+                  {[['#1d4ed8','Volume'],['#059669','Resolved'],['#ea580c','Escalated'],['#d97706','FTFR %']].map(([c,l]) => (
+                    <span key={l} className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full" style={{background:c}}/>{l}</span>
                   ))}
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={historicalRepairData} margin={{ top: 5, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
-                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[60, 100]} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
-                  <Bar yAxisId="left" dataKey="volume" fill="#6366F1" fillOpacity={0.85} radius={[4,4,0,0]} barSize={28} name="Volume" />
-                  <Bar yAxisId="left" dataKey="resolved" fill="#10B981" fillOpacity={0.85} radius={[4,4,0,0]} barSize={28} name="Resolved" />
-                  <Bar yAxisId="left" dataKey="escalated" fill="#F97316" fillOpacity={0.85} radius={[4,4,0,0]} barSize={16} name="Escalated" />
-                  <Line yAxisId="right" type="monotone" dataKey="ftfr" stroke="#F59E0B" strokeWidth={3} dot={{ r: 5, fill: '#F59E0B', stroke: '#fff', strokeWidth: 2 }} name="FTFR %" />
+              <ResponsiveContainer width="100%" height={200}>
+                <ComposedChart data={filteredTrend} margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b', fontWeight: 600 }} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#94a3b8' }} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#94a3b8' }} domain={[60, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '0px', border: '1px solid #e2e8f0', fontSize: 10, fontWeight: 700, boxShadow: 'none' }} />
+                  <Bar yAxisId="left" dataKey="volume" fill="#1d4ed8" fillOpacity={0.8} radius={[2,2,0,0]} barSize={24} />
+                  <Bar yAxisId="left" dataKey="resolved" fill="#059669" fillOpacity={0.8} radius={[2,2,0,0]} barSize={24} />
+                  <Bar yAxisId="left" dataKey="escalated" fill="#ea580c" fillOpacity={0.8} radius={[2,2,0,0]} barSize={12} />
+                  <Line yAxisId="right" type="monotone" dataKey="ftfr" stroke="#d97706" strokeWidth={2} dot={{ r: 4, fill: '#fff', stroke: '#d97706', strokeWidth: 2 }} />
                 </ComposedChart>
               </ResponsiveContainer>
-              <div className="mt-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-                <p className="text-[10px] font-bold text-indigo-800 leading-relaxed"><span className="font-black">AI Insight:</span> FTFR improved +8pp (Jan→Apr). Primary driver: CHI-142 stock realignment driven by MTBF predictions cut escalations from 12 to 2 cases/month.</p>
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-sm">
+                <p className="text-[10px] font-bold text-blue-900 leading-relaxed"><span className="bg-blue-700 text-white px-1.5 py-0.5 rounded-sm text-[8px] mr-2">AI INSIGHT</span> FTFR improved +8pp (Jan→Apr). Realignment driven by predictive modeling at CHI-142 reduced critical escalations by 83%.</p>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Model Cut —</h4>
-              <p className="text-base font-black text-gray-900 mb-5">FTFR % by Device Family</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={ftfrByModelData} margin={{ top: 5, right: 15, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 700 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[55, 100]} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
-                  <Line type="monotone" dataKey="S24 Ultra" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 4, fill: '#6366F1', stroke: '#fff', strokeWidth: 2 }} />
-                  <Line type="monotone" dataKey="A54" stroke="#10B981" strokeWidth={2.5} dot={{ r: 4, fill: '#10B981', stroke: '#fff', strokeWidth: 2 }} />
-                  <Line type="monotone" dataKey="M34" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 4, fill: '#F59E0B', stroke: '#fff', strokeWidth: 2 }} />
-                  <Line type="monotone" dataKey="Z Fold4" stroke="#8B5CF6" strokeWidth={2.5} dot={{ r: 4, fill: '#8B5CF6', stroke: '#fff', strokeWidth: 2 }} />
+            <div className="col-span-4 bg-white border border-slate-200 rounded-sm shadow-sm p-5">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Model Distribution</h4>
+              <p className="text-sm font-bold text-slate-900 mb-6">FTFR % Trends by Family</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={filteredFtfrByModel} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#64748b', fontWeight: 600 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#94a3b8' }} domain={[55, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '0px', border: '1px solid #e2e8f0', fontSize: 10, fontWeight: 700 }} />
+                  <Line type="monotone" dataKey="S24 Ultra" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="A54" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="M34" stroke="#d97706" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Z Fold4" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {[['#6366F1','S24 Ultra'],['#10B981','A54'],['#F59E0B','M34'],['#8B5CF6','Z Fold4']].map(([c,l]) => (
-                  <span key={l} className="flex items-center gap-1 text-[9px] font-black text-gray-500"><span className="w-2 h-2 rounded-full" style={{background:c}}/>{l}</span>
+              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-5">
+                {[['#1d4ed8','S24 Ultra'],['#059669','A54'],['#d97706','M34'],['#7c3aed','Z Fold4']].map(([c,l]) => (
+                  <span key={l} className="flex items-center gap-1.5 text-[8px] font-bold text-slate-500 uppercase"><span className="w-2 h-2 rounded-full" style={{background:c}}/>{l}</span>
                 ))}
               </div>
             </div>
           </div>
 
           {/* HOTSPOT + RCA */}
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-4">
             {/* Hotspot Table */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-5">
               <div className="flex justify-between items-start mb-5">
                 <div>
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Hotspot Identification —</h4>
-                  <p className="text-base font-black text-gray-900">Partner Delay Risk Ranking</p>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Partner Risk Hub</h4>
+                  <p className="text-sm font-bold text-slate-900">Delay Hotspot Identification</p>
                 </div>
-                <span className="px-2 py-1 bg-red-50 text-red-600 text-[9px] font-black rounded-lg border border-red-100 uppercase">2 Critical</span>
+                <span className="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-bold rounded-sm border border-red-100 uppercase">2 Critical</span>
               </div>
-              <div className="rounded-xl overflow-hidden border border-gray-100">
-                <table className="w-full text-xs">
-                  <thead className="bg-gray-50 border-b border-gray-100">
-                    <tr>{['Partner','Region','Avg Res.','Repeat%','SLA Breach','Score'].map(h=>(
-                      <th key={h} className="px-3 py-2 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">{h}</th>
-                    ))}</tr>
+              <div className="rounded-sm overflow-hidden border border-slate-100">
+                <table className="w-full text-[11px]">
+                  <thead className="bg-slate-50 border-b border-slate-100">
+                    <tr className="text-slate-400 font-bold uppercase tracking-tight text-[9px] text-left">
+                      {['Partner','Region','Avg Res.','SLA Gap','Score'].map(h=>(
+                        <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {hotspotData.map((h, i) => (
-                      <tr key={i} className={`hover:bg-gray-50 transition-colors ${h.level==='critical'?'bg-red-50/40':h.level==='high'?'bg-amber-50/30':''}`}>
-                        <td className="px-3 py-2.5 font-bold text-gray-800 flex items-center gap-1.5">
+                  <tbody className="divide-y divide-slate-50">
+                    {filteredHotspots.length > 0 ? filteredHotspots.map((h, i) => (
+                      <tr key={i} className={`hover:bg-slate-50 transition-colors ${h.level==='critical'?'bg-red-50/20':h.level==='high'?'bg-amber-50/20':''}`}>
+                        <td className="px-3 py-2.5 font-bold text-slate-800 flex items-center gap-1.5 whitespace-nowrap">
                           {h.level==='critical'&&<span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"/>}
                           {h.level==='high'&&<span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"/>}
-                          {h.level==='low'&&<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"/>}
-                          <span className="truncate max-w-[110px]">{h.name}</span>
+                          <span className="truncate">{h.name}</span>
                         </td>
-                        <td className="px-3 py-2.5 text-gray-500 font-semibold">{h.region}</td>
-                        <td className="px-3 py-2.5 font-black text-gray-800">{h.avgResTime}h</td>
-                        <td className="px-3 py-2.5 font-bold text-gray-700">{h.repeatRate}%</td>
-                        <td className="px-3 py-2.5 font-bold text-gray-700">{h.slaBreach}%</td>
+                        <td className="px-3 py-2.5 text-slate-500 font-medium">{h.region}</td>
+                        <td className="px-3 py-2.5 font-bold text-slate-800">{h.avgResTime}h</td>
+                        <td className="px-3 py-2.5 font-bold text-red-600">{h.slaBreach}%</td>
                         <td className="px-3 py-2.5">
-                          <span className={`font-black text-[10px] px-2 py-0.5 rounded-full ${h.score>70?'bg-red-100 text-red-700':h.score>45?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700'}`}>{h.score}</span>
+                          <span className={`font-bold text-[9px] px-2 py-0.5 rounded-sm ${h.score>70?'bg-red-800 text-white':h.score>45?'bg-amber-100 text-amber-800':'bg-emerald-100 text-emerald-800'}`}>{h.score}</span>
                         </td>
                       </tr>
-                    ))}
+                    )) : (
+                      <tr><td colSpan="5" className="p-10 text-center text-slate-400 font-bold uppercase text-[9px]">No matching partners</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
 
             {/* Automated RCA */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-5">
               <div className="flex justify-between items-start mb-5">
                 <div>
-                  <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Automated RCA —</h4>
-                  <p className="text-base font-black text-gray-900">Time Delay Root Cause Pareto</p>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Root Cause Analysis</h4>
+                  <p className="text-sm font-bold text-slate-900">Time Delay Distribution (Pareto)</p>
                 </div>
-                <span className="px-2 py-1 bg-indigo-50 text-indigo-700 text-[9px] font-black rounded-lg border border-indigo-100 uppercase">P80 Rule</span>
+                <span className="px-2 py-0.5 bg-slate-800 text-white text-[9px] font-bold rounded-sm uppercase">P80 Rule Map</span>
               </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <ComposedChart data={rcaDelayData} margin={{ top: 5, right: 30, left: 0, bottom: 30 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                  <XAxis dataKey="cause" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#9CA3AF', fontWeight: 700 }} interval={0} angle={-15} textAnchor="end" height={45} />
-                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} domain={[0, 100]} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
-                  <Bar yAxisId="left" dataKey="count" radius={[4,4,0,0]} barSize={36} name="Case Count">
-                    {rcaDelayData.map((e,i) => <Cell key={i} fill={e.color} fillOpacity={0.85} />)}
+              <ResponsiveContainer width="100%" height={180}>
+                <ComposedChart data={filteredRca} margin={{ top: 5, right: 30, left: 0, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="cause" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#64748b', fontWeight: 600 }} angle={-10} textAnchor="end" height={35} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#94a3b8' }} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 8, fill: '#94a3b8' }} domain={[0, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: '0', border: '1px solid #e2e8f0', fontSize: 10, fontWeight: 700 }} />
+                  <Bar yAxisId="left" dataKey="count" radius={[2,2,0,0]} barSize={30}>
+                    {filteredRca.map((e,i) => <Cell key={i} fill={e.color} fillOpacity={0.8} />)}
                   </Bar>
-                  <Line yAxisId="right" type="monotone" dataKey="cumPct" stroke="#4F46E5" strokeWidth={3} dot={{ r: 4, fill: '#4F46E5', stroke: '#fff', strokeWidth: 2 }} name="Cumulative %" />
-                  <ReferenceLine yAxisId="right" y={80} stroke="#4F46E5" strokeDasharray="4 4" strokeWidth={1.5} />
+                  <Line yAxisId="right" type="monotone" dataKey="cumPct" stroke="#1e293b" strokeWidth={2} dot={{ r: 3, fill: '#1e293b' }} />
+                  <ReferenceLine yAxisId="right" y={80} stroke="#1e293b" strokeDasharray="4 4" strokeWidth={1} />
                 </ComposedChart>
               </ResponsiveContainer>
-              <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-xl">
-                <p className="text-[10px] font-bold text-red-800 leading-relaxed"><span className="font-black">AI RCA:</span> 70% of delays are driven by Part Stockout + Wrong Routing. CHI-142 accounts for 42% of stockout-delay cases. Recommend safety stock uplift + AI triage routing.</p>
+              <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-sm">
+                <p className="text-[10px] font-bold text-red-900 leading-relaxed"><span className="text-red-700 uppercase font-bold mr-2 text-[8px] border border-red-200 px-1 py-0.5 rounded-sm bg-white">RCA ALARM</span> 70% of bottleneck driven by Stockout + Routing. Recommend immediate buffer adjustment for SKU group PT01.</p>
               </div>
             </div>
           </div>
 
+          {/* RCA DRILL-DOWN TABLE */}
+          <div className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+              <div>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Drill-Down Matrix</h4>
+                <p className="text-sm font-bold text-slate-900">Partner × Root Cause Detail Analysis</p>
+              </div>
+              <span className="px-2 py-0.5 bg-red-50 text-red-700 text-[9px] font-bold rounded-sm border border-red-100 uppercase">33 Delayed Cases</span>
+            </div>
+            <table className="w-full text-xs">
+              <thead className="bg-slate-50 border-b border-slate-100">
+                <tr className="text-slate-400 font-bold uppercase tracking-tight text-[9px] text-left">
+                  {['Partner','Part SKU','# Delays','Primary Cause','Avg Latency','% Impact','Fix Strategy'].map(h=>(
+                    <th key={h} className="px-4 py-2.5">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {rcaDrilldownData.map((row, i) => (
+                  <tr key={i} className={`hover:bg-slate-50 transition-colors ${row.status === 'critical' ? 'bg-red-50/20' : ''}`}>
+                    <td className="px-4 py-3 font-bold text-slate-800">{row.partner}</td>
+                    <td className="px-4 py-3 text-slate-500 font-bold tracking-tighter">{row.part}</td>
+                    <td className="px-4 py-3 font-bold text-slate-900">{row.delayedCount}</td>
+                    <td className="px-4 py-3 font-medium text-slate-700">{row.cause}</td>
+                    <td className="px-4 py-3 font-bold text-slate-900">{row.avgDelay}h</td>
+                    <td className="px-4 py-3"><span className={`font-bold text-[9px] px-2 py-0.5 rounded-sm ${row.pctTotal > 20 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-600'}`}>{row.pctTotal}%</span></td>
+                    <td className="px-4 py-3 text-[9px] font-bold text-blue-700 uppercase tracking-tight">{row.action}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* TOP DELAYED PARTS + PARTNER PERFORMANCE COMPARISON */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Top Delayed Parts */}
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Part Impact Analysis</h4>
+                  <p className="text-sm font-bold text-slate-900">Highest Frequency Delay SKU List</p>
+                </div>
+              </div>
+              <table className="w-full text-[11px]">
+                <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 uppercase font-bold tracking-tight text-left">
+                  <tr>
+                    {['SKU','Impact Events','Avg Latency','Stock Policy','Status'].map(h=>(
+                      <th key={h} className="px-4 py-2.5">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {topDelayedPartsData.map((row, i) => (
+                    <tr key={i} className={`hover:bg-slate-50 transition-colors ${row.status === 'critical' ? 'bg-red-50/20' : ''}`}>
+                      <td className="px-4 py-3 font-bold text-slate-800 uppercase tracking-tighter">{row.sku}</td>
+                      <td className="px-4 py-3 font-bold text-slate-900">{row.delayEvents}</td>
+                      <td className="px-4 py-3 font-medium text-slate-600">{row.avgOosDays} days</td>
+                      <td className="px-4 py-3 text-slate-500 font-medium">{row.minStock}/{row.maxStock}</td>
+                      <td className="px-4 py-3"><span className={`font-bold text-[9px] px-2 py-0.5 rounded-sm ${row.status === 'critical' ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-600'}`}>{row.status.toUpperCase()}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Partner Performance Comparative */}
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Partner Ranking</h4>
+                  <p className="text-sm font-bold text-slate-900">Comparative Performance Assessment</p>
+                </div>
+              </div>
+              <table className="w-full text-[11px]">
+                <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 uppercase font-bold tracking-tight text-left">
+                  <tr>
+                    {['Partner','SLA Rate','Lead Time','OOS','Score','Tier'].map(h=>(
+                      <th key={h} className="px-4 py-2.5">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {partnerComparisonData.map((row, i) => {
+                    const isTop = row.slaRate >= 90;
+                    return (
+                      <tr key={i} className={`hover:bg-slate-50 transition-colors ${isTop ? 'bg-emerald-50/20' : ''}`}>
+                        <td className="px-4 py-3 font-bold text-slate-800">{row.partner.split(' (')[0]}</td>
+                        <td className="px-4 py-3 font-bold text-slate-900">{row.slaRate}%</td>
+                        <td className="px-4 py-3 font-medium text-slate-600">{row.avgLeadTime}h</td>
+                        <td className="px-4 py-3"><span className={`font-bold text-[9px] px-2 py-0.5 rounded-sm ${row.stockouts > 10 ? 'bg-red-700 text-white' : 'bg-slate-100 text-slate-600'}`}>{row.stockouts}</span></td>
+                        <td className="px-4 py-3 font-bold text-slate-800">{row.customerScore}</td>
+                        <td className="px-4 py-3"><span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 border border-slate-200 rounded-sm">{row.tier}</span></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {/* DELAY PIE + ACTIONABLE INSIGHTS */}
-          <div className="grid grid-cols-3 gap-5">
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Delay Analysis —</h4>
-              <p className="text-base font-black text-gray-900 mb-4">Delayed Repairs by Root Bucket</p>
-              <ResponsiveContainer width="100%" height={190}>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-5">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Delay Attribution</h4>
+              <p className="text-sm font-bold text-slate-900 mb-6">Root Cause Volume by Segment</p>
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={delayBucketData} cx="50%" cy="50%" innerRadius={48} outerRadius={78} paddingAngle={3} dataKey="value">
-                    {delayBucketData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                  <Pie data={filteredDelayBuckets} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={2} dataKey="value">
+                    {filteredDelayBuckets.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
+                  <Tooltip contentStyle={{ borderRadius: '0', border: '1px solid #e2e8f0', fontSize: 10, fontWeight: 700 }} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 mt-3">
-                {delayBucketData.map((d, i) => (
-                  <div key={i} className="flex items-center justify-between text-[10px]">
-                    <span className="flex items-center gap-1.5 font-semibold text-gray-600"><span className="w-2 h-2 rounded-full" style={{background:d.color}}/>{d.name}</span>
-                    <span className="font-black text-gray-800">{d.value} cases</span>
+              <div className="space-y-1.5 mt-5">
+                {filteredDelayBuckets.map((d, i) => (
+                  <div key={i} className="flex items-center justify-between text-[9px] uppercase font-bold">
+                    <span className="flex items-center gap-2 text-slate-500 font-bold"><span className="w-2 h-2 rounded-full" style={{background:d.color}}/>{d.name}</span>
+                    <span className="text-slate-800">{d.value}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <p className="text-[10px] font-bold text-gray-500">Screen + Battery stockouts = <span className="text-red-600 font-black">44%</span> of all delays this period.</p>
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <p className="text-[9px] font-bold text-slate-500">Inventory factors = <span className="text-red-700 font-bold">44%</span> of aggregate delays.</p>
               </div>
             </div>
 
-            <div className="col-span-2 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Actionable Insights —</h4>
-              <p className="text-base font-black text-gray-900 mb-4">System-Generated Recommendations</p>
+            <div className="col-span-2 bg-white border border-slate-200 rounded-sm shadow-sm p-5">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">AI Countermeasures</h4>
+              <p className="text-sm font-bold text-slate-900 mb-6">Autonomous Recommendation Engine</p>
               <div className="grid grid-cols-2 gap-3">
                 {actionableInsightsData.map((ins, i) => (
-                  <div key={i} className={`bg-${ins.color}-50 border border-${ins.color}-200 rounded-xl p-4`}>
-                    <div className="flex items-start gap-2 mb-2">
-                      <div className={`p-1.5 rounded-lg bg-${ins.color}-100`}>
-                        <ins.icon size={13} className={`text-${ins.color}-600`} />
+                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-sm p-4 relative overflow-hidden group hover:border-blue-300 transition-all">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className={`p-1.5 rounded-sm bg-white border border-slate-100`}>
+                        <ins.icon size={13} className="text-blue-700" />
                       </div>
-                      <p className={`text-[11px] font-black text-${ins.color}-900 leading-tight flex-1`}>{ins.title}</p>
+                      <p className="text-[10px] font-bold text-slate-800 leading-tight uppercase tracking-tight">{ins.title}</p>
                     </div>
-                    <p className={`text-[10px] font-semibold text-${ins.color}-700 leading-relaxed mb-3`}>{ins.desc}</p>
-                    <button className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-${ins.color}-600 text-white hover:opacity-90 transition-opacity shadow-sm`}>{ins.action} →</button>
+                    <p className="text-[10px] font-medium text-slate-500 leading-normal mb-4 h-[30px] overflow-hidden">{ins.desc}</p>
+                    <button className="text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm bg-slate-800 text-white hover:bg-slate-900 transition-all">EXECUTE ACTION</button>
                   </div>
                 ))}
               </div>
@@ -767,55 +1259,53 @@ export default function ReservationQueue({ model }) {
           </div>
 
           {/* PARTNER PERFORMANCE TABLE */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+          <div className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-center">
               <div>
-                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Partner Performance Mgt —</h4>
-                <p className="text-base font-black text-gray-900">Top / Bottom Performing Partners</p>
-              </div>
-              <div className="flex items-center gap-3 text-[9px] font-black text-gray-400 uppercase">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400"/>Top 3</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400"/>Bottom 2</span>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Partner Performance</h4>
+                <p className="text-sm font-bold text-slate-900">SLA Compliance & FTFR Reliability Matrix</p>
               </div>
             </div>
             <table className="w-full text-xs">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>{['#','Partner','Region','Tier','FTFR%','Avg Res. Time','Delayed','SLA Comp.','Trend','Repairs MTD'].map(h => (
-                  <th key={h} className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">{h}</th>
-                ))}</tr>
+              <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-tight text-[9px] text-left">
+                <tr>
+                  {['','Vendor','Region','Tier','FTFR','Avg Res.','Delayed','SLA Compliance','Trend','Load'].map(h=>(
+                    <th key={h} className="px-4 py-2.5">{h}</th>
+                  ))}
+                </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
-                {partnerPerformanceData.map((p, i) => {
-                  const isTop = i < 3;
-                  const isBot = i >= partnerPerformanceData.length - 2;
+              <tbody className="divide-y divide-slate-50">
+                {filteredPartnerPerf.map((p, i) => {
+                  const isTop = (i < 3 && perfPartnerFilter === 'All Partners');
+                  const isBot = (i >= partnerPerformanceData.length - 2 && perfPartnerFilter === 'All Partners');
                   return (
-                    <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${isTop ? 'bg-emerald-50/30' : isBot ? 'bg-red-50/30' : ''}`}>
+                    <tr key={p.id} className={`hover:bg-slate-50 transition-colors ${isTop ? 'bg-emerald-50/20' : isBot ? 'bg-red-50/20' : ''}`}>
                       <td className="px-4 py-3">
-                        {isTop ? <Award size={14} className="text-emerald-500" /> : isBot ? <AlertCircle size={14} className="text-red-400" /> : <span className="text-gray-400 font-bold text-xs">{i+1}</span>}
+                        {isTop ? <Award size={14} className="text-emerald-600" /> : isBot ? <AlertCircle size={14} className="text-red-500" /> : <span className="text-slate-300 font-bold text-xs">{i+1}</span>}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-black text-gray-900">{p.name}</div>
-                        <div className="text-[9px] text-gray-400 font-semibold">{p.id} · {p.city}</div>
+                        <div className="font-bold text-slate-900">{p.name}</div>
+                        <div className="text-[9px] text-slate-400 font-medium uppercase">{p.id} · {p.city}</div>
                       </td>
-                      <td className="px-4 py-3 text-gray-600 font-semibold">{p.region}</td>
+                      <td className="px-4 py-3 text-slate-600 font-medium">{p.region}</td>
                       <td className="px-4 py-3">
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${p.tier==='Platinum'?'bg-purple-100 text-purple-700':p.tier==='Gold'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-600'}`}>{p.tier}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 border border-slate-200 rounded-sm">{p.tier}</span>
                       </td>
-                      <td className="px-4 py-3 font-black text-gray-900">{p.ftfr}%</td>
-                      <td className="px-4 py-3 font-bold text-gray-700">{p.avgResTime}h</td>
-                      <td className="px-4 py-3 font-bold text-gray-700">{p.delayedCases}</td>
+                      <td className="px-4 py-3 font-bold text-slate-900">{p.ftfr}%</td>
+                      <td className="px-4 py-3 font-medium text-slate-700">{p.avgResTime}h</td>
+                      <td className="px-4 py-3 font-bold text-slate-900">{p.delayedCases}</td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden w-16">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden w-20">
                             <div className={`h-full rounded-full ${p.slaCompliance>90?'bg-emerald-500':p.slaCompliance>80?'bg-amber-400':'bg-red-500'}`} style={{width:`${p.slaCompliance}%`}} />
                           </div>
-                          <span className="font-black text-[10px] text-gray-700">{p.slaCompliance}%</span>
+                          <span className="font-bold text-[10px] text-slate-700">{p.slaCompliance}%</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        {p.trend==='up' ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-red-400" />}
+                        {p.trend==='up' ? <TrendingUp size={14} className="text-emerald-600" /> : <TrendingDown size={14} className="text-red-500" />}
                       </td>
-                      <td className="px-4 py-3 font-black text-indigo-700">{p.repairs}</td>
+                      <td className="px-4 py-3 font-bold text-blue-700">{p.repairs}</td>
                     </tr>
                   );
                 })}
@@ -824,26 +1314,26 @@ export default function ReservationQueue({ model }) {
           </div>
 
           {/* TECHNICIAN LOAD */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-            <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Human Capital —</h4>
-            <p className="text-base font-black text-gray-900 mb-5">Technician Load & Active Cases</p>
+          <div className="bg-white border border-slate-200 rounded-sm shadow-sm p-5">
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Human Capital</h4>
+            <p className="text-sm font-bold text-slate-900 mb-6">Technician Load & Active Queue Analysis</p>
             <div className="grid grid-cols-3 gap-4">
-              {techLoadData.map((t, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <User size={14} className="text-indigo-600" />
+              {filteredTechLoad.map((t, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-sm bg-slate-50 border border-slate-100 group hover:border-blue-300 transition-all">
+                  <div className="w-8 h-8 rounded-sm bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    <User size={14} className="text-slate-400 group-hover:text-blue-700" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[11px] font-black text-gray-800 truncate">{t.tech}</span>
-                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${t.load>90?'bg-red-100 text-red-700':'bg-indigo-100 text-indigo-700'}`}>{t.active} ACT</span>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-[10px] font-bold text-slate-800 truncate">{t.tech}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-sm bg-blue-100 text-blue-700 tracking-tighter`}>{t.active} PROJECTS</span>
                     </div>
-                    <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${t.load>90?'bg-red-500':t.load>75?'bg-amber-400':'bg-indigo-500'}`} style={{width:`${t.load}%`}} />
+                    <div className="h-1 bg-slate-200 rounded-full overflow-hidden">
+                      <div className={`h-full ${t.load>90?'bg-red-600':t.load>75?'bg-amber-500':'bg-blue-600'}`} style={{width:`${t.load}%`}} />
                     </div>
-                    <div className="flex justify-between mt-0.5">
-                      <span className="text-[9px] text-gray-400 font-semibold">{t.store}</span>
-                      <span className={`text-[9px] font-black ${t.load>90?'text-red-600':t.load>75?'text-amber-600':'text-gray-500'}`}>{t.load}%</span>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-[8px] text-slate-400 font-bold uppercase">{t.store}</span>
+                      <span className={`text-[9px] font-bold ${t.load>90?'text-red-600':'text-slate-600'}`}>{t.load}% UTIL</span>
                     </div>
                   </div>
                 </div>
@@ -877,6 +1367,179 @@ export default function ReservationQueue({ model }) {
             ))}
           </div>
 
+          {/* INSTALL BASE BY MODEL × REGION */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Install Base Analysis —</h4>
+              <p className="text-base font-black text-gray-900">Device Population by Model × Region (Units)</p>
+            </div>
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  {['Model','N. Metro','S. Metro','Rural W','Total','Avg Age'].map(h=>(
+                    <th key={h} className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {installBaseByRegion.map((row, i) => {
+                  const isTotal = row.model === 'TOTAL';
+                  const isHeroProduct = row.model === 'S24 Ultra' || row.model === 'A54';
+                  return (
+                    <tr key={i} className={`hover:bg-gray-50 transition-colors ${isTotal ? 'bg-gray-100' : isHeroProduct ? 'bg-teal-50/30' : ''}`}>
+                      <td className={`px-4 py-3 font-black ${isTotal ? 'text-gray-800' : 'text-gray-800'}`}>{row.model}</td>
+                      <td className="px-4 py-3 text-gray-700 font-semibold">{row.nMetro.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-gray-700 font-semibold">{row.sMetro.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-gray-700 font-semibold">{row.ruralW.toLocaleString()}</td>
+                      <td className={`px-4 py-3 font-black ${isTotal ? 'text-gray-900' : 'text-gray-800'}`}>{row.total.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-gray-600 font-semibold">{row.avgAge} mo</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ANNUAL FAILURE RATES */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Failure Analysis —</h4>
+              <p className="text-base font-black text-gray-900">Annual Failure Rates & Monthly Demand by Part</p>
+            </div>
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  {['Device','Part','Annual %','BOM','Monthly Demand','Formula'].map(h=>(
+                    <th key={h} className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {failureRateByPart.map((row, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 font-bold text-gray-800 text-[10px]">{row.model}</td>
+                    <td className="px-4 py-3 text-gray-600 font-semibold text-[10px]">{row.part}</td>
+                    <td className="px-4 py-3"><span className="font-black text-gray-800">{row.failPct}%</span></td>
+                    <td className="px-4 py-3 text-gray-700 font-bold">{row.bomQty}</td>
+                    <td className="px-4 py-3 font-black text-gray-800">{row.demand} units</td>
+                    <td className="px-4 py-3 text-[9px] text-indigo-600 font-semibold">IB×{row.failPct}%÷12</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* BOM USAGE BY REPAIR TYPE + EXPECTED MONTHLY DEMAND */}
+          <div className="grid grid-cols-2 gap-5">
+            {/* BOM Usage Table */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Parts Requirements —</h4>
+                <p className="text-base font-black text-gray-900">BOM Usage Per Repair Scenario</p>
+              </div>
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Repair Type','Parts','SKU','Cost','Total'].map(h=>(
+                      <th key={h} className="px-3 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {bomUsageData.map((row, i) => (
+                    <tr key={i} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-3 py-3 font-bold text-gray-800 text-[10px]">{row.repairType}</td>
+                      <td className="px-3 py-3 text-gray-600 font-semibold text-[9px]">{row.parts}</td>
+                      <td className="px-3 py-3 text-gray-600 text-[9px]">{row.skus}</td>
+                      <td className="px-3 py-3 text-gray-700 font-bold">${row.cost.toFixed(2)}</td>
+                      <td className="px-3 py-3 font-black text-indigo-700">${row.total.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Expected Monthly Demand */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Demand Calculation —</h4>
+                <p className="text-base font-black text-gray-900">Expected Monthly Demand with Peak Multiplier</p>
+              </div>
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['SKU','IB','Fail%','Base','Peak','Formula'].map(h=>(
+                      <th key={h} className="px-3 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {expectedMonthlyDemand.map((row, i) => (
+                    <tr key={i} className="hover:bg-indigo-50/20 transition-colors">
+                      <td className="px-3 py-3 font-bold text-gray-800 text-[9px]">{row.sku.split(' —')[0]}</td>
+                      <td className="px-3 py-3 text-center font-bold text-gray-700 text-[10px]">{(row.ib/1000).toFixed(0)}K</td>
+                      <td className="px-3 py-3 text-center font-bold text-gray-700">{row.failRate}%</td>
+                      <td className="px-3 py-3 text-center font-black text-indigo-700">{row.monthlyBase}</td>
+                      <td className="px-3 py-3 text-center font-black text-amber-700">{row.peak}</td>
+                      <td className="px-3 py-3 text-center text-[8px] text-gray-500 font-semibold">IB×F÷12×1.35</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="p-3 bg-slate-950 border-t border-gray-100">
+                <p className="text-[9px] font-bold text-teal-300"><span className="font-black">Formula:</span> Monthly = (IB × Failure_Rate ÷ 12) | Peak = Monthly × 1.35</p>
+              </div>
+            </div>
+          </div>
+
+          {/* HISTORICAL VS IB-DRIVEN POLICY COMPARISON */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Policy Evolution —</h4>
+                <p className="text-base font-black text-gray-900">Historical vs IB-Driven Stocking Strategy</p>
+              </div>
+              <span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-[9px] font-black rounded-lg border border-emerald-100 uppercase">Optimized</span>
+            </div>
+            <div className="space-y-3">
+              {policyComparison.map((policy, i) => (
+                <div key={i} className="grid grid-cols-2 gap-4">
+                  {/* Old Policy */}
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-1 h-6 bg-red-500 rounded-full"></div>
+                      <div>
+                        <p className="text-[9px] font-black text-red-400 uppercase">Historical Policy</p>
+                        <p className="text-[11px] font-black text-red-900">{policy.part}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-[10px]">
+                      <div><span className="text-red-600 font-black">Min/Max:</span> <span className="text-red-800 font-bold">{policy.oldMin}/{policy.oldMax}</span></div>
+                      <div><span className="text-red-600 font-black">Coverage:</span> <span className="text-red-800 font-bold">{policy.oldCoverage} days</span></div>
+                      <p className="text-red-700 font-semibold mt-2">Based on historical demand only. Frequent stockouts during peak seasons.</p>
+                    </div>
+                  </div>
+
+                  {/* New Policy */}
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
+                      <div>
+                        <p className="text-[9px] font-black text-emerald-400 uppercase">IB-Driven Policy</p>
+                        <p className="text-[11px] font-black text-emerald-900">{policy.part}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-[10px]">
+                      <div><span className="text-emerald-600 font-black">Min/Max:</span> <span className="text-emerald-800 font-bold">{policy.newMin}/{policy.newMax}</span></div>
+                      <div><span className="text-emerald-600 font-black">Coverage:</span> <span className="text-emerald-800 font-bold">{policy.newCoverage} days</span></div>
+                      <p className="text-emerald-700 font-semibold mt-2">{policy.impact}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* INSTALLED BASE FORECAST */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
             <div className="flex justify-between items-start mb-5">
@@ -898,7 +1561,7 @@ export default function ReservationQueue({ model }) {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#D1D5DB' }} />
                 <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: 11, fontWeight: 700 }} />
                 <ReferenceLine x="Apr" stroke="#E5E7EB" strokeWidth={2} strokeDasharray="6 3" label={{ value: 'Forecast →', position: 'top', fontSize: 9, fill: '#9CA3AF', fontWeight: 700 }} />
-                <Line type="monotone" dataKey="S24 Ultra" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 3 }} strokeDasharray={(d) => d.isForecast ? '5 4' : '0'} />
+                <Line type="monotone" dataKey="S24 Ultra" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="A54" stroke="#10B981" strokeWidth={2.5} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="M34" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="Z Fold4" stroke="#8B5CF6" strokeWidth={2.5} dot={{ r: 3 }} />
